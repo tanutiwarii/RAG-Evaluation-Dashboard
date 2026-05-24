@@ -54,6 +54,11 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+      - name: Detect frontend directory
+        run: |
+          if [ -d "Frontend" ]; then echo "FRONTEND_DIR=Frontend" >> $GITHUB_ENV
+          elif [ -d "frontend" ]; then echo "FRONTEND_DIR=frontend" >> $GITHUB_ENV
+          else echo "No frontend directory found"; exit 1; fi
 
       - uses: actions/setup-node@v4
         with:
@@ -63,15 +68,15 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.npm
-          key: ${{ runner.os }}-node-${{ hashFiles('Frontend/package-lock.json') }}
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
           restore-keys: |
             ${{ runner.os }}-node-
 
       - name: Install dependencies
-        run: cd Frontend && npm ci
+        run: cd $FRONTEND_DIR && npm ci
 
       - name: Run tests
-        run: cd Frontend && npm test
+        run: cd $FRONTEND_DIR && npm test
 
       - name: Build
-        run: cd Frontend && npm run build
+        run: cd $FRONTEND_DIR && npm run build
