@@ -6,7 +6,7 @@ Provides an async session context manager used in route handlers.
 """
 
 from contextlib import asynccontextmanager
-from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
+from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
 from app.config import settings
 from app.db.models import Base
 

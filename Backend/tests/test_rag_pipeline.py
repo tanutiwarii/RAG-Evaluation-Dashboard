@@ -17,7 +17,7 @@ Run with:
 """
 
 import pytest
-from unittest.mock import patch, MagicMock, AsyncMock, call
+from unittest.mock import patch, MagicMock
 from langchain.schema import Document
 
 from app.core.rag_pipeline import (
@@ -504,7 +504,6 @@ class TestComparePipelineVariants:
     @pytest.mark.asyncio
     async def test_avg_latency_is_correct_average(self, sample_chunks, mock_chain):
         from app.schemas.eval_schema import RAGASScores
-        import asyncio
 
         mock_scores = RAGASScores(
             faithfulness=0.8, answer_relevancy=0.8,

@@ -196,7 +196,6 @@ async def compare_chunking_strategies(
             question = item["question"]
             ground_truth = item["ground_truth"]
 
-            import asyncio
             rag_output = await asyncio.get_event_loop().run_in_executor(
                 None, lambda: pipeline({"query": question})
             )

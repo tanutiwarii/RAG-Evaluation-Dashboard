@@ -29,7 +29,6 @@ Usage:
 
 import logging
 from functools import lru_cache
-from typing import Optional
 
 from langchain.schema import Document, BaseRetriever
 from langchain_community.vectorstores import Chroma

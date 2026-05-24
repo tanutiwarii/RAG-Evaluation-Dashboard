@@ -14,7 +14,7 @@ Run with: pytest backend/tests/ -v
 """
 
 import pytest
-from unittest.mock import patch, MagicMock, AsyncMock
+from unittest.mock import patch, MagicMock
 from langchain.schema import Document
 
 from app.core.chunking import (

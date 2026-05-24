@@ -17,7 +17,6 @@ Pattern:
 """
 
 import json
-import time
 import logging
 from datetime import datetime, timezone
 
@@ -159,8 +158,6 @@ async def evaluate_single_endpoint(request: Request, body: SingleEvalRequest):
         "pipeline_name": "recursive-512"
     }
     """
-    start = time.perf_counter()
-
     try:
         scores, latency_ms = await evaluate_single(
             question=body.question,

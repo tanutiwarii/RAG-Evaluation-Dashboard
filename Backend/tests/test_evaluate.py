@@ -13,12 +13,11 @@ Run with:  pytest backend/tests/ -v
 
 import json
 import pytest
-import asyncio
-from unittest.mock import patch, AsyncMock, MagicMock
+from unittest.mock import patch, AsyncMock
 from httpx import AsyncClient, ASGITransport
 
 from app.main import app
-from app.schemas.eval_schema import RAGASScores, SingleEvalRequest
+from app.schemas.eval_schema import RAGASScores
 
 
 # ── Schema tests ────────────────────────────────────────────────────────────────
