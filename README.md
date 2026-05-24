@@ -50,8 +50,8 @@ make install
 make dev          # runs FastAPI on :8000
 
 # Frontend
-make frontend-install
-make frontend-dev  # runs React on :3000
+make Frontend-install
+make Frontend-dev  # runs React on :3000
 
 # Tests
 make test
@@ -68,7 +68,7 @@ rag-eval-dashboard/
 │   │   ├── db/           # SQLAlchemy models + async session
 │   │   └── schemas/      # Pydantic request/response models
 │   └── tests/
-├── frontend/
+├── Frontend/
 │   └── src/
 │       ├── components/   # RadarChart, ScoreCard, EvalProgress, HistoryTable
 │       └── pages/        # Upload, Evaluate, History

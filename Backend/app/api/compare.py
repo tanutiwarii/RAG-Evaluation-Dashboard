@@ -54,7 +54,7 @@ async def _run_chunking_compare(job_id: str, pdf_path: str, test_dataset: list[d
     try:
         docs = load_documents(pdf_path)
 
-        # Notify frontend that docs are loaded
+        # Notify Frontend that docs are loaded
         await job_store.push_event(job_id, {
             "event": "progress",
             "job_id": job_id,

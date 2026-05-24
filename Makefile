@@ -25,8 +25,8 @@ lint:
 format:
 	ruff format backend/
 
-frontend-install:
-	cd frontend && npm install
+Frontend-install:
+	cd Frontend && npm install
 
-frontend-dev:
-	cd frontend && npm run dev
+Frontend-dev:
+	cd Frontend && npm run dev
