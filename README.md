@@ -10,6 +10,7 @@
 ## What it does
 
 - Evaluates RAG pipelines on **5 RAGAS metrics**: faithfulness, answer relevancy, context precision, context recall, answer correctness
+- Supports both local internal LangChain pipelines and external RAG service endpoints via `external_pipeline_url`
 - **Live SSE streaming** — see scores update question-by-question in real time
 - **Chunking Lab** — compare fixed, recursive, and semantic chunking side-by-side
 - **Pipeline comparison** — vector vs re-rank vs hybrid retrieval

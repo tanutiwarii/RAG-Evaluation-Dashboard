@@ -181,7 +181,7 @@ class TestBatchEndpoint:
             })
         assert response.status_code == 404
 
-    async def test_batch_requires_pdf_path_for_internal_pipeline(self):
+    async def test_batch_requires_pdf_path_for_internal_pipeline(self, tmp_path):
         dataset_file = tmp_path / "test_dataset.json"
         dataset_file.write_text(json.dumps([
             {"question": "What is RAG?", "ground_truth": "RAG is retrieval-augmented generation."}
@@ -197,7 +197,7 @@ class TestBatchEndpoint:
         assert response.status_code == 422
         assert "pdf_path" in response.text
 
-    async def test_batch_requires_url_for_external_pipeline(self):
+    async def test_batch_requires_url_for_external_pipeline(self, tmp_path):
         dataset_file = tmp_path / "test_dataset.json"
         dataset_file.write_text(json.dumps([
             {"question": "What is RAG?", "ground_truth": "RAG is retrieval-augmented generation."}

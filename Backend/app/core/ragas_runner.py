@@ -7,6 +7,7 @@ to avoid blocking the FastAPI event loop.
 """
 
 import asyncio
+import inspect
 import time
 import logging
 from functools import partial
@@ -122,9 +123,9 @@ async def evaluate_batch(
         # 1. Get answer + retrieved context from the RAG pipeline.
         # The pipeline may be either:
         #   - a sync LangChain callable, or
-        #   - an async pipeline runner with a `.run(question)` method.
+        #   - an async pipeline runner with a `.run(question)` coroutine.
         rag_start = time.perf_counter()
-        if hasattr(pipeline, "run"):
+        if hasattr(pipeline, "run") and inspect.iscoroutinefunction(pipeline.run):
             rag_output = await pipeline.run(question)
         else:
             rag_output = await asyncio.get_event_loop().run_in_executor(
