@@ -22,6 +22,10 @@ export function EvaluatePage({ setGlobalStatus }) {
   // Batch eval state
   const [batchForm, setBatchForm] = useState({
     pipeline_name: "recursive-rerank",
+    pipeline_type: "internal",
+    pdf_path: "",
+    external_pipeline_url: "",
+    external_pipeline_headers: "",
     dataset_path: "eval/test_dataset.json",
   });
 
@@ -72,7 +76,13 @@ export function EvaluatePage({ setGlobalStatus }) {
 
     try {
       const { job_id, message } = await startBatchEval({
-        pipeline_name:     batchForm.pipeline_name,
+        pipeline_name: batchForm.pipeline_name,
+        pipeline_type: batchForm.pipeline_type,
+        pdf_path: batchForm.pdf_path,
+        external_pipeline_url: batchForm.external_pipeline_url,
+        external_pipeline_headers: batchForm.external_pipeline_headers
+          ? JSON.parse(batchForm.external_pipeline_headers)
+          : undefined,
         test_dataset_path: batchForm.dataset_path,
       });
       addEvent(`Job created: ${job_id}`);
@@ -185,6 +195,47 @@ export function EvaluatePage({ setGlobalStatus }) {
               <Field label="Pipeline name">
                 <input value={batchForm.pipeline_name} onChange={e => setBatchForm(f => ({ ...f, pipeline_name: e.target.value }))} />
               </Field>
+              <Field label="Pipeline source">
+                <div style={{ display: "flex", gap: 8 }}>
+                  {[
+                    { id: "internal", label: "Internal pipeline" },
+                    { id: "external", label: "External pipeline" },
+                  ].map(option => (
+                    <button
+                      key={option.id}
+                      type="button"
+                      onClick={() => setBatchForm(f => ({ ...f, pipeline_type: option.id }))}
+                      style={{
+                        padding: "8px 14px",
+                        borderRadius: 8,
+                        border: "1px solid",
+                        background: batchForm.pipeline_type === option.id ? "var(--accent)" : "transparent",
+                        color: batchForm.pipeline_type === option.id ? "#fff" : "var(--text2)",
+                        borderColor: batchForm.pipeline_type === option.id ? "var(--accent)" : "var(--border2)",
+                        cursor: "pointer",
+                      }}
+                    >
+                      {option.label}
+                    </button>
+                  ))}
+                </div>
+              </Field>
+
+              {batchForm.pipeline_type === "internal" ? (
+                <Field label="PDF path for internal pipeline">
+                  <input value={batchForm.pdf_path} onChange={e => setBatchForm(f => ({ ...f, pdf_path: e.target.value }))} placeholder="path/to/document.pdf" />
+                </Field>
+              ) : (
+                <>
+                  <Field label="External pipeline URL">
+                    <input value={batchForm.external_pipeline_url} onChange={e => setBatchForm(f => ({ ...f, external_pipeline_url: e.target.value }))} placeholder="https://api.example.com/pipeline" />
+                  </Field>
+                  <Field label="Optional headers (JSON)">
+                    <textarea rows={3} value={batchForm.external_pipeline_headers} onChange={e => setBatchForm(f => ({ ...f, external_pipeline_headers: e.target.value }))} placeholder='{"Authorization": "Bearer ..."}' />
+                  </Field>
+                </>
+              )}
+
               <Field label="Test dataset path">
                 <input value={batchForm.dataset_path} onChange={e => setBatchForm(f => ({ ...f, dataset_path: e.target.value }))} />
               </Field>

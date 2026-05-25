@@ -12,7 +12,7 @@ services:
       timeout: 5s
       retries: 5
 
-  Frontend:
+  frontend:
     build: ./Frontend
     ports: ["3000:3000"]
     depends_on: [api]

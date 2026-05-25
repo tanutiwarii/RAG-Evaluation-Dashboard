@@ -28,11 +28,11 @@ from slowapi.util import get_remote_address
 from app.schemas.eval_schema import (
     SingleEvalRequest, SingleEvalResponse,
     BatchEvalRequest, BatchJobResponse,
-    BatchEvalResult, RAGASScores,
+    BatchEvalResult, RAGASScores, PipelineType,
 )
 from app.core.ragas_runner import evaluate_single, evaluate_batch, aggregate_scores
 from app.core.job_store import job_store
-from app.core.rag_pipeline import build_pipeline
+from app.core.pipeline_adapter import InternalPipelineRunner, ExternalPipelineRunner
 from app.db.database import get_db
 from app.db.models import EvalRun
 import sqlalchemy as sa
@@ -59,7 +59,30 @@ def _sse_format(event_type: str, data: dict) -> str:
     return f"event: {event_type}\ndata: {payload}\n\n"
 
 
-async def _batch_eval_task(job_id: str, pipeline_name: str, test_dataset: list[dict]):
+async def _build_pipeline_runner(body: BatchEvalRequest):
+    if body.pipeline_type == PipelineType.internal:
+        if not body.pdf_path:
+            raise HTTPException(
+                status_code=422,
+                detail="pdf_path is required for internal pipeline evaluation",
+            )
+        return InternalPipelineRunner(
+            pdf_path=body.pdf_path,
+            pipeline_name=body.pipeline_name,
+        )
+
+    if body.external_pipeline_url is None:
+        raise HTTPException(
+            status_code=422,
+            detail="external_pipeline_url is required for external pipeline evaluation",
+        )
+    return ExternalPipelineRunner(
+        endpoint=str(body.external_pipeline_url),
+        headers=body.external_pipeline_headers,
+    )
+
+
+async def _batch_eval_task(job_id: str, pipeline_name: str, pipeline_runner, test_dataset: list[dict]):
     """
     Background task that runs the full evaluation loop.
     Pushes SSE-ready events into job_store as each question completes.
@@ -67,8 +90,9 @@ async def _batch_eval_task(job_id: str, pipeline_name: str, test_dataset: list[d
     job_store.set_status(job_id, "running")
     total = len(test_dataset)
 
-    # Load the RAG pipeline once for the whole batch
-    pipeline = build_pipeline(pipeline_name=pipeline_name)
+    # Use the configured pipeline runner for every question.
+    # This can be either a local LangChain pipeline or an external RAG service.
+    pipeline = pipeline_runner
 
     # Progress callback — called after each question evaluates
     async def on_progress(completed: int, total: int, question: str, scores: RAGASScores):
@@ -209,14 +233,19 @@ async def evaluate_batch_endpoint(
     if not test_dataset:
         raise HTTPException(status_code=422, detail="Test dataset is empty")
 
+    pipeline_runner = await _build_pipeline_runner(body)
     job_id = job_store.create_job()
-    logger.info(f"Batch eval job {job_id} created for pipeline '{body.pipeline_name}'")
+    logger.info(
+        f"Batch eval job {job_id} created for pipeline '{body.pipeline_name}' "
+        f"type={body.pipeline_type}"
+    )
 
     # Fire the background task — returns immediately
     background_tasks.add_task(
         _batch_eval_task,
         job_id=job_id,
         pipeline_name=body.pipeline_name,
+        pipeline_runner=pipeline_runner,
         test_dataset=test_dataset,
     )
 

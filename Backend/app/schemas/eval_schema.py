@@ -1,6 +1,13 @@
-from pydantic import BaseModel, Field
-from typing import Optional
+from enum import Enum
+from typing import Literal, Optional
 from datetime import datetime
+
+from pydantic import AnyUrl, BaseModel, Field
+
+
+class PipelineType(str, Enum):
+    internal = "internal"
+    external = "external"
 
 
 # ── Request bodies ─────────────────────────────────────────────────────────────
@@ -17,6 +24,22 @@ class SingleEvalRequest(BaseModel):
 class BatchEvalRequest(BaseModel):
     """Run a full test dataset through the pipeline for evaluation."""
     pipeline_name: str = Field(..., description="Name/label for this run (e.g. 'recursive-512')")
+    pipeline_type: PipelineType = Field(
+        default=PipelineType.internal,
+        description="Whether to evaluate a local internal pipeline or an external RAG service",
+    )
+    pdf_path: Optional[str] = Field(
+        default=None,
+        description="Path to the PDF document for internal pipeline evaluation",
+    )
+    external_pipeline_url: Optional[AnyUrl] = Field(
+        default=None,
+        description="HTTP endpoint for an external RAG pipeline",
+    )
+    external_pipeline_headers: Optional[dict[str, str]] = Field(
+        default=None,
+        description="Optional headers to send to the external pipeline",
+    )
     test_dataset_path: Optional[str] = Field(
         default="eval/test_dataset.json",
         description="Path to the JSON test dataset file"

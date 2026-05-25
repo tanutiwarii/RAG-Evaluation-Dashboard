@@ -161,6 +161,8 @@ class TestBatchEndpoint:
             async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
                 response = await client.post("/api/evaluate/batch", json={
                     "pipeline_name": "test-pipeline",
+                    "pipeline_type": "external",
+                    "external_pipeline_url": "https://example.com/pipeline",
                     "test_dataset_path": str(dataset_file),
                 })
 
@@ -173,9 +175,43 @@ class TestBatchEndpoint:
         async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
             response = await client.post("/api/evaluate/batch", json={
                 "pipeline_name": "test",
+                "pipeline_type": "external",
+                "external_pipeline_url": "https://example.com/pipeline",
                 "test_dataset_path": "/nonexistent/path.json",
             })
         assert response.status_code == 404
+
+    async def test_batch_requires_pdf_path_for_internal_pipeline(self):
+        dataset_file = tmp_path / "test_dataset.json"
+        dataset_file.write_text(json.dumps([
+            {"question": "What is RAG?", "ground_truth": "RAG is retrieval-augmented generation."}
+        ]))
+
+        async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
+            response = await client.post("/api/evaluate/batch", json={
+                "pipeline_name": "test-pipeline",
+                "pipeline_type": "internal",
+                "test_dataset_path": str(dataset_file),
+            })
+
+        assert response.status_code == 422
+        assert "pdf_path" in response.text
+
+    async def test_batch_requires_url_for_external_pipeline(self):
+        dataset_file = tmp_path / "test_dataset.json"
+        dataset_file.write_text(json.dumps([
+            {"question": "What is RAG?", "ground_truth": "RAG is retrieval-augmented generation."}
+        ]))
+
+        async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
+            response = await client.post("/api/evaluate/batch", json={
+                "pipeline_name": "test-pipeline",
+                "pipeline_type": "external",
+                "test_dataset_path": str(dataset_file),
+            })
+
+        assert response.status_code == 422
+        assert "external_pipeline_url" in response.text
 
 
 @pytest.mark.asyncio

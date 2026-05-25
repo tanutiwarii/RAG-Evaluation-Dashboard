@@ -119,11 +119,17 @@ async def evaluate_batch(
         question = item["question"]
         ground_truth = item["ground_truth"]
 
-        # 1. Get answer + retrieved context from the RAG pipeline
+        # 1. Get answer + retrieved context from the RAG pipeline.
+        # The pipeline may be either:
+        #   - a sync LangChain callable, or
+        #   - an async pipeline runner with a `.run(question)` method.
         rag_start = time.perf_counter()
-        rag_output = await asyncio.get_event_loop().run_in_executor(
-            None, partial(pipeline, {"query": question})
-        )
+        if hasattr(pipeline, "run"):
+            rag_output = await pipeline.run(question)
+        else:
+            rag_output = await asyncio.get_event_loop().run_in_executor(
+                None, partial(pipeline, {"query": question})
+            )
         rag_latency = (time.perf_counter() - rag_start) * 1000
 
         answer = rag_output["result"]

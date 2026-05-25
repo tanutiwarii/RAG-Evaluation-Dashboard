@@ -20,11 +20,33 @@ export async function evaluateSingle({ question, answer, contexts, ground_truth,
   return res.json();
 }
 
-export async function startBatchEval({ pipeline_name, test_dataset_path }) {
+export async function startBatchEval({
+  pipeline_name,
+  pipeline_type,
+  pdf_path,
+  external_pipeline_url,
+  external_pipeline_headers,
+  test_dataset_path,
+}) {
+  const payload = {
+    pipeline_name,
+    pipeline_type,
+    test_dataset_path,
+  };
+
+  if (pipeline_type === "internal") {
+    payload.pdf_path = pdf_path;
+  } else if (pipeline_type === "external") {
+    payload.external_pipeline_url = external_pipeline_url;
+    if (external_pipeline_headers) {
+      payload.external_pipeline_headers = external_pipeline_headers;
+    }
+  }
+
   const res = await fetch(`${BASE}/api/evaluate/batch`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ pipeline_name, test_dataset_path }),
+    body: JSON.stringify(payload),
   });
   if (!res.ok) throw new Error(await res.text());
   return res.json(); // { job_id, status, message }
