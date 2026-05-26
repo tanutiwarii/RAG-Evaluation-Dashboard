@@ -25,7 +25,7 @@ from langchain.text_splitter import (
     CharacterTextSplitter,
 )
 from langchain_experimental.text_splitter import SemanticChunker
-from langchain_openai import OpenAIEmbeddings
+from app.core.embeddings import get_embedding_model
 
 logger = logging.getLogger(__name__)
 
@@ -100,7 +100,7 @@ def semantic_chunks(
 
     How it works:
       1. Splits text into individual sentences
-      2. Embeds each sentence with OpenAI embeddings
+      2. Embeds each sentence with provider-aware embeddings
       3. Computes cosine similarity between adjacent sentences
       4. Inserts a chunk boundary when similarity drops below threshold
 
@@ -110,8 +110,9 @@ def semantic_chunks(
 
     breakpoint_threshold_type options: "percentile", "standard_deviation", "interquartile"
     """
+    emb = get_embedding_model()
     splitter = SemanticChunker(
-        embeddings=OpenAIEmbeddings(),
+        embeddings=emb,
         breakpoint_threshold_type=breakpoint_threshold_type,
         breakpoint_threshold_amount=breakpoint_threshold_amount,
     )

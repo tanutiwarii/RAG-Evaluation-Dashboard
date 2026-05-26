@@ -12,10 +12,13 @@ Both run as background jobs with SSE streaming — same pattern as /api/evaluate
 import json
 import logging
 from datetime import datetime, timezone
+from pathlib import Path
 
 from fastapi import APIRouter, BackgroundTasks, HTTPException
 from pydantic import BaseModel
 from typing import Optional
+
+from app.config import PROJECT_ROOT
 
 from app.core.chunking import compare_chunking_strategies, ChunkStrategy
 from app.core.rag_pipeline import build_pipeline, compare_pipeline_variants, load_documents
@@ -51,7 +54,9 @@ def _sse(event_type: str, data: dict) -> str:
 async def _run_chunking_compare(job_id: str, pdf_path: str, test_dataset: list[dict], chunk_size: int, strategies: list):
     job_store.set_status(job_id, "running")
     try:
-        docs = load_documents(pdf_path)
+        if not Path(pdf_path).is_absolute():
+            pdf_path = PROJECT_ROOT / pdf_path
+        docs = load_documents(str(pdf_path))
 
         # Notify Frontend that docs are loaded
         await job_store.push_event(job_id, {
@@ -96,8 +101,10 @@ async def _run_pipeline_compare(job_id: str, pdf_path: str, test_dataset: list[d
             "message": "Running vector, rerank, and hybrid pipeline variants...",
         })
 
+        if not Path(pdf_path).is_absolute():
+            pdf_path = PROJECT_ROOT / pdf_path
         results = await compare_pipeline_variants(
-            pdf_path=pdf_path,
+            pdf_path=str(pdf_path),
             test_dataset=test_dataset,
             eval_fn=evaluate_single,
         )
@@ -133,11 +140,15 @@ async def compare_chunking(body: ChunkingCompareRequest, background_tasks: Backg
     """
     import aiofiles
 
+    test_dataset_path = Path(body.test_dataset_path)
+    if not test_dataset_path.is_absolute():
+        test_dataset_path = PROJECT_ROOT / test_dataset_path
+
     try:
-        async with aiofiles.open(body.test_dataset_path) as f:
+        async with aiofiles.open(test_dataset_path) as f:
             test_dataset = json.loads(await f.read())
     except FileNotFoundError:
-        raise HTTPException(status_code=404, detail="Test dataset not found")
+        raise HTTPException(status_code=404, detail=f"Test dataset not found: {test_dataset_path}")
 
     strategies = body.strategies or [s.value for s in ChunkStrategy]
     job_id = job_store.create_job()
@@ -172,11 +183,15 @@ async def compare_pipelines(body: PipelineCompareRequest, background_tasks: Back
     """
     import aiofiles
 
+    test_dataset_path = Path(body.test_dataset_path)
+    if not test_dataset_path.is_absolute():
+        test_dataset_path = PROJECT_ROOT / test_dataset_path
+
     try:
-        async with aiofiles.open(body.test_dataset_path) as f:
+        async with aiofiles.open(test_dataset_path) as f:
             test_dataset = json.loads(await f.read())
     except FileNotFoundError:
-        raise HTTPException(status_code=404, detail="Test dataset not found")
+        raise HTTPException(status_code=404, detail=f"Test dataset not found: {test_dataset_path}")
 
     job_id = job_store.create_job()
 

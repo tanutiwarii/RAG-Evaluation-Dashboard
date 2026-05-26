@@ -29,6 +29,7 @@ Usage:
 
 import logging
 from functools import lru_cache
+from typing import Any
 
 from langchain.schema import Document, BaseRetriever
 from langchain_community.vectorstores import Chroma
@@ -128,7 +129,7 @@ class ReRankingRetriever(BaseRetriever):
     Use exactly like vectordb.as_retriever() — plug it into any LangChain chain.
     """
 
-    vectordb: Chroma
+    vectordb: Any
     top_k_fetch: int = 20
     top_n_return: int = 4
     model_name: str = "cross-encoder/ms-marco-MiniLM-L-6-v2"
@@ -226,7 +227,7 @@ class HybridRetriever(BaseRetriever):
     Result: documents that appear highly ranked in BOTH lists score highest.
     """
 
-    vectordb: Chroma
+    vectordb: Any
     bm25_index: BM25Index
     top_k: int = 20
     top_n_return: int = 4

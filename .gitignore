@@ -10,3 +10,5 @@ dist/
 build/
 *.egg-info/
 *.venv
+*.env
+Backend/.env

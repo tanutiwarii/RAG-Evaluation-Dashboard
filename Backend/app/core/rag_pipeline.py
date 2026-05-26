@@ -14,12 +14,16 @@ Used by:
 """
 
 import logging
+from pathlib import Path
 
 from langchain.document_loaders import PyPDFLoader
 from langchain_community.vectorstores import Chroma
-from langchain_openai import OpenAIEmbeddings, ChatOpenAI
 from langchain.chains import RetrievalQA
 from langchain.schema import Document
+
+from app.core.embeddings import get_embedding_model
+from app.core.groq_llm import GroqLLM
+from app.config import settings, PROJECT_ROOT
 
 from app.core.chunking import chunk_documents, ChunkStrategy
 from app.core.reranker import build_reranking_retriever, build_hybrid_retriever
@@ -49,12 +53,15 @@ def build_vectordb(
     If persist_dir is set, ChromaDB will save to disk so you don't re-embed on restart.
     """
     persist_dir = persist_dir or settings.CHROMA_PERSIST_DIR
+    if persist_dir and not Path(persist_dir).is_absolute():
+        persist_dir = PROJECT_ROOT / persist_dir
 
+    emb = get_embedding_model()
     vectordb = Chroma.from_documents(
         documents=chunks,
-        embedding=OpenAIEmbeddings(),
+        embedding=emb,
         collection_name=collection_name,
-        persist_directory=persist_dir,
+        persist_directory=str(persist_dir),
     )
     logger.info(f"ChromaDB built: {len(chunks)} chunks in collection '{collection_name}'")
     return vectordb
@@ -69,7 +76,7 @@ def build_pipeline(
     retriever_mode: str = "rerank",
     top_k_fetch: int = 20,
     top_n_return: int = 4,
-    llm_model: str = "gpt-4o-mini",
+    llm_model: str = "groq-1",
 ) -> RetrievalQA:
     """
     Builds and returns a LangChain RetrievalQA pipeline.
@@ -86,7 +93,7 @@ def build_pipeline(
         retriever_mode : "vector" | "rerank" | "hybrid"
         top_k_fetch    : how many candidates to fetch before re-ranking
         top_n_return   : how many chunks to pass to the LLM as context
-        llm_model      : OpenAI model name for generation
+        llm_model      : model name for generation
 
     Returns:
         A LangChain RetrievalQA chain with return_source_documents=True
@@ -95,7 +102,11 @@ def build_pipeline(
     if chunks is None:
         if pdf_path is None:
             raise ValueError("Either pdf_path or chunks must be provided")
-        docs = load_documents(pdf_path)
+        if not Path(pdf_path).is_absolute():
+            candidate = PROJECT_ROOT / pdf_path
+            if candidate.exists():
+                pdf_path = candidate
+        docs = load_documents(str(pdf_path))
         chunks = chunk_documents(docs, strategy=chunk_strategy, chunk_size=chunk_size)
 
     # ── 2. Build vector store ─────────────────────────────────────────────────
@@ -133,11 +144,9 @@ def build_pipeline(
         raise ValueError(f"Unknown retriever_mode: '{retriever_mode}'. Choose from {RETRIEVER_MODES}")
 
     # ── 4. Build LLM + chain ──────────────────────────────────────────────────
-    llm = ChatOpenAI(
-        model=llm_model,
-        temperature=0,          # Deterministic — important for reproducible eval
-        openai_api_key=settings.OPENAI_API_KEY,
-    )
+    if settings.LLM_PROVIDER.lower() != "groq":
+        raise RuntimeError("Only groq is supported as the LLM provider")
+    llm = GroqLLM(model=llm_model)
 
     chain = RetrievalQA.from_chain_type(
         llm=llm,

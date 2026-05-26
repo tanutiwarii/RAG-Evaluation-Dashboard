@@ -31,7 +31,7 @@ React dashboard → FastAPI (async) → RAGAS eval engine
 ```bash
 # 1. Clone and configure
 cp .env.example .env
-# Fill in OPENAI_API_KEY and LANGCHAIN_API_KEY
+# Fill in GROQ_API_KEY and LANGCHAIN_API_KEY
 
 # 2. One-command startup
 make docker-up
@@ -41,6 +41,32 @@ open http://localhost:3000
 
 # 4. MLflow UI
 open http://localhost:5000
+```
+
+## External pipeline support
+
+The batch evaluator now supports both internal and external RAG pipelines.
+
+- `pipeline_type: internal` uses a local LangChain pipeline built from `pdf_path`.
+- `pipeline_type: external` uses `external_pipeline_url` and expects JSON with:
+  - `result` / `answer` / `response`
+  - `contexts` or `source_documents`
+
+Example external request body:
+
+```json
+{
+  "pipeline_name": "external-demo",
+  "pipeline_type": "external",
+  "external_pipeline_url": "http://localhost:9000/pipeline",
+  "test_dataset_path": "eval/test_dataset.json"
+}
+```
+
+Run the sample external stub with:
+
+```bash
+uvicorn app.examples.external_pipeline_stub:app --reload --port 9000
 ```
 
 ## Development setup
@@ -62,7 +88,7 @@ make test
 
 ```
 rag-eval-dashboard/
-├── backend/
+├── Backend/
 │   ├── app/
 │   │   ├── api/          # FastAPI route handlers
 │   │   ├── core/         # RAG pipeline, RAGAS runner, chunking, re-ranking
@@ -73,7 +99,7 @@ rag-eval-dashboard/
 │   └── src/
 │       ├── components/   # RadarChart, ScoreCard, EvalProgress, HistoryTable
 │       └── pages/        # Upload, Evaluate, History
-├── eval/
+├── Eval/
 │   └── test_dataset.json # Ground-truth Q&A pairs
 └── .github/workflows/    # CI pipeline
 ```

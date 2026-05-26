@@ -1,5 +1,5 @@
 dev:
-	uvicorn app.main:app --reload --port 8000 --app-dir backend
+	uvicorn app.main:app --reload --port 8000 --app-dir Backend
 
 docker-up:
 	docker compose up --build
@@ -8,22 +8,22 @@ docker-down:
 	docker compose down -v
 
 test:
-	pytest backend/tests/ -v
+	pytest Backend/tests/ -v
 
 migrate:
-	cd backend && alembic upgrade head
+	cd Backend && alembic upgrade head
 
 eval:
-	python eval/run_eval.py
+	python Eval/run_eval.py
 
 install:
-	pip install -r backend/requirements.txt
+	pip install -r Backend/requirements.txt
 
 lint:
-	ruff check backend/
+	ruff check Backend/
 
 format:
-	ruff format backend/
+	ruff format Backend/
 
 Frontend-install:
 	cd Frontend && npm install

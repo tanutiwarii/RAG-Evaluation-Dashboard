@@ -123,7 +123,7 @@ class TestLoadDocuments:
 class TestBuildVectordb:
     def test_creates_chroma_with_correct_collection_name(self, sample_chunks):
         with patch("app.core.rag_pipeline.Chroma") as MockChroma, \
-             patch("app.core.rag_pipeline.OpenAIEmbeddings"):
+             patch("app.core.rag_pipeline.get_embedding_model"):
             build_vectordb(sample_chunks, collection_name="test_collection")
 
         call_kwargs = MockChroma.from_documents.call_args.kwargs
@@ -131,7 +131,7 @@ class TestBuildVectordb:
 
     def test_passes_all_chunks_to_chroma(self, sample_chunks):
         with patch("app.core.rag_pipeline.Chroma") as MockChroma, \
-             patch("app.core.rag_pipeline.OpenAIEmbeddings"):
+             patch("app.core.rag_pipeline.get_embedding_model"):
             build_vectordb(sample_chunks)
 
         call_args = MockChroma.from_documents.call_args
@@ -140,7 +140,7 @@ class TestBuildVectordb:
 
     def test_uses_settings_persist_dir_by_default(self, sample_chunks):
         with patch("app.core.rag_pipeline.Chroma") as MockChroma, \
-             patch("app.core.rag_pipeline.OpenAIEmbeddings"), \
+             patch("app.core.rag_pipeline.get_embedding_model"), \
              patch("app.core.rag_pipeline.settings") as mock_settings:
             mock_settings.CHROMA_PERSIST_DIR = "/tmp/test_chroma"
             build_vectordb(sample_chunks)
@@ -150,7 +150,7 @@ class TestBuildVectordb:
 
     def test_accepts_explicit_persist_dir(self, sample_chunks):
         with patch("app.core.rag_pipeline.Chroma") as MockChroma, \
-             patch("app.core.rag_pipeline.OpenAIEmbeddings"):
+             patch("app.core.rag_pipeline.get_embedding_model"):
             build_vectordb(sample_chunks, persist_dir="/custom/dir")
 
         call_kwargs = MockChroma.from_documents.call_args.kwargs
@@ -159,7 +159,7 @@ class TestBuildVectordb:
     def test_returns_chroma_instance(self, sample_chunks):
         mock_vdb = MagicMock()
         with patch("app.core.rag_pipeline.Chroma") as MockChroma, \
-             patch("app.core.rag_pipeline.OpenAIEmbeddings"):
+             patch("app.core.rag_pipeline.get_embedding_model"):
             MockChroma.from_documents.return_value = mock_vdb
             result = build_vectordb(sample_chunks)
 
@@ -176,7 +176,7 @@ class TestBuildPipeline:
             patch("app.core.rag_pipeline.load_documents"),
             patch("app.core.rag_pipeline.chunk_documents"),
             patch("app.core.rag_pipeline.build_vectordb"),
-            patch("app.core.rag_pipeline.ChatOpenAI"),
+            patch("app.core.rag_pipeline.GroqLLM"),
             patch("app.core.rag_pipeline.RetrievalQA"),
             patch("app.core.rag_pipeline.build_reranking_retriever"),
             patch("app.core.rag_pipeline.build_hybrid_retriever"),
@@ -190,7 +190,7 @@ class TestBuildPipeline:
         with patch("app.core.rag_pipeline.load_documents", return_value=sample_docs) as mock_load, \
              patch("app.core.rag_pipeline.chunk_documents", return_value=sample_chunks), \
              patch("app.core.rag_pipeline.build_vectordb", return_value=mock_vectordb), \
-             patch("app.core.rag_pipeline.ChatOpenAI"), \
+             patch("app.core.rag_pipeline.GroqLLM"), \
              patch("app.core.rag_pipeline.RetrievalQA") as MockQA, \
              patch("app.core.rag_pipeline.build_reranking_retriever"):
             MockQA.from_chain_type.return_value = mock_chain
@@ -201,7 +201,7 @@ class TestBuildPipeline:
     def test_skips_loading_when_chunks_provided(self, sample_chunks, mock_vectordb, mock_chain):
         with patch("app.core.rag_pipeline.load_documents") as mock_load, \
              patch("app.core.rag_pipeline.build_vectordb", return_value=mock_vectordb), \
-             patch("app.core.rag_pipeline.ChatOpenAI"), \
+             patch("app.core.rag_pipeline.GroqLLM"), \
              patch("app.core.rag_pipeline.RetrievalQA") as MockQA, \
              patch("app.core.rag_pipeline.build_reranking_retriever"):
             MockQA.from_chain_type.return_value = mock_chain
@@ -213,7 +213,7 @@ class TestBuildPipeline:
 
     def test_vector_mode_uses_as_retriever(self, sample_chunks, mock_vectordb, mock_chain):
         with patch("app.core.rag_pipeline.build_vectordb", return_value=mock_vectordb), \
-             patch("app.core.rag_pipeline.ChatOpenAI"), \
+             patch("app.core.rag_pipeline.GroqLLM"), \
              patch("app.core.rag_pipeline.RetrievalQA") as MockQA:
             MockQA.from_chain_type.return_value = mock_chain
             build_pipeline(chunks=sample_chunks, retriever_mode="vector")
@@ -222,7 +222,7 @@ class TestBuildPipeline:
 
     def test_rerank_mode_calls_build_reranking_retriever(self, sample_chunks, mock_vectordb, mock_chain):
         with patch("app.core.rag_pipeline.build_vectordb", return_value=mock_vectordb), \
-             patch("app.core.rag_pipeline.ChatOpenAI"), \
+             patch("app.core.rag_pipeline.GroqLLM"), \
              patch("app.core.rag_pipeline.RetrievalQA") as MockQA, \
              patch("app.core.rag_pipeline.build_reranking_retriever") as mock_rerank:
             MockQA.from_chain_type.return_value = mock_chain
@@ -232,7 +232,7 @@ class TestBuildPipeline:
 
     def test_hybrid_mode_calls_build_hybrid_retriever(self, sample_chunks, mock_vectordb, mock_chain):
         with patch("app.core.rag_pipeline.build_vectordb", return_value=mock_vectordb), \
-             patch("app.core.rag_pipeline.ChatOpenAI"), \
+             patch("app.core.rag_pipeline.GroqLLM"), \
              patch("app.core.rag_pipeline.RetrievalQA") as MockQA, \
              patch("app.core.rag_pipeline.build_hybrid_retriever") as mock_hybrid:
             MockQA.from_chain_type.return_value = mock_chain
@@ -242,7 +242,7 @@ class TestBuildPipeline:
 
     def test_invalid_retriever_mode_raises(self, sample_chunks, mock_vectordb):
         with patch("app.core.rag_pipeline.build_vectordb", return_value=mock_vectordb), \
-             patch("app.core.rag_pipeline.ChatOpenAI"):
+             patch("app.core.rag_pipeline.GroqLLM"):
             with pytest.raises(ValueError, match="Unknown retriever_mode"):
                 build_pipeline(chunks=sample_chunks, retriever_mode="nonexistent")
 
@@ -256,7 +256,7 @@ class TestBuildPipeline:
         with patch("app.core.rag_pipeline.load_documents", return_value=sample_docs), \
              patch("app.core.rag_pipeline.chunk_documents", return_value=sample_chunks) as mock_chunk, \
              patch("app.core.rag_pipeline.build_vectordb", return_value=mock_vectordb), \
-             patch("app.core.rag_pipeline.ChatOpenAI"), \
+             patch("app.core.rag_pipeline.GroqLLM"), \
              patch("app.core.rag_pipeline.RetrievalQA") as MockQA, \
              patch("app.core.rag_pipeline.build_reranking_retriever"):
             MockQA.from_chain_type.return_value = mock_chain
@@ -269,7 +269,7 @@ class TestBuildPipeline:
         with patch("app.core.rag_pipeline.load_documents", return_value=sample_docs), \
              patch("app.core.rag_pipeline.chunk_documents", return_value=sample_chunks) as mock_chunk, \
              patch("app.core.rag_pipeline.build_vectordb", return_value=mock_vectordb), \
-             patch("app.core.rag_pipeline.ChatOpenAI"), \
+             patch("app.core.rag_pipeline.GroqLLM"), \
              patch("app.core.rag_pipeline.RetrievalQA") as MockQA, \
              patch("app.core.rag_pipeline.build_reranking_retriever"):
             MockQA.from_chain_type.return_value = mock_chain
@@ -283,30 +283,30 @@ class TestBuildPipeline:
     def test_llm_temperature_is_zero(self, sample_chunks, mock_vectordb, mock_chain):
         """Temperature must be 0 for deterministic, reproducible evals."""
         with patch("app.core.rag_pipeline.build_vectordb", return_value=mock_vectordb), \
-             patch("app.core.rag_pipeline.ChatOpenAI") as MockLLM, \
+             patch("app.core.rag_pipeline.GroqLLM") as MockLLM, \
              patch("app.core.rag_pipeline.RetrievalQA") as MockQA, \
              patch("app.core.rag_pipeline.build_reranking_retriever"):
             MockQA.from_chain_type.return_value = mock_chain
             build_pipeline(chunks=sample_chunks)
 
         call_kwargs = MockLLM.call_args.kwargs
-        assert call_kwargs["temperature"] == 0
+        assert call_kwargs["model"] == "groq-1"
 
     def test_custom_llm_model_passed_through(self, sample_chunks, mock_vectordb, mock_chain):
         with patch("app.core.rag_pipeline.build_vectordb", return_value=mock_vectordb), \
-             patch("app.core.rag_pipeline.ChatOpenAI") as MockLLM, \
+             patch("app.core.rag_pipeline.GroqLLM") as MockLLM, \
              patch("app.core.rag_pipeline.RetrievalQA") as MockQA, \
              patch("app.core.rag_pipeline.build_reranking_retriever"):
             MockQA.from_chain_type.return_value = mock_chain
-            build_pipeline(chunks=sample_chunks, llm_model="gpt-4o")
+            build_pipeline(chunks=sample_chunks, llm_model="groq-1")
 
         call_kwargs = MockLLM.call_args.kwargs
-        assert call_kwargs["model"] == "gpt-4o"
+        assert call_kwargs["model"] == "groq-1"
 
     def test_return_source_documents_is_true(self, sample_chunks, mock_vectordb, mock_chain):
         """source_documents must be True — RAGAS needs them for context extraction."""
         with patch("app.core.rag_pipeline.build_vectordb", return_value=mock_vectordb), \
-             patch("app.core.rag_pipeline.ChatOpenAI"), \
+             patch("app.core.rag_pipeline.GroqLLM"), \
              patch("app.core.rag_pipeline.RetrievalQA") as MockQA, \
              patch("app.core.rag_pipeline.build_reranking_retriever"):
             MockQA.from_chain_type.return_value = mock_chain
@@ -317,7 +317,7 @@ class TestBuildPipeline:
 
     def test_returns_retrieval_qa_chain(self, sample_chunks, mock_vectordb, mock_chain):
         with patch("app.core.rag_pipeline.build_vectordb", return_value=mock_vectordb), \
-             patch("app.core.rag_pipeline.ChatOpenAI"), \
+             patch("app.core.rag_pipeline.GroqLLM"), \
              patch("app.core.rag_pipeline.RetrievalQA") as MockQA, \
              patch("app.core.rag_pipeline.build_reranking_retriever"):
             MockQA.from_chain_type.return_value = mock_chain
@@ -329,7 +329,7 @@ class TestBuildPipeline:
 
     def test_collection_name_includes_pipeline_name_and_strategy(self, sample_chunks, mock_vectordb, mock_chain):
         with patch("app.core.rag_pipeline.build_vectordb", return_value=mock_vectordb) as mock_vdb_fn, \
-             patch("app.core.rag_pipeline.ChatOpenAI"), \
+             patch("app.core.rag_pipeline.GroqLLM"), \
              patch("app.core.rag_pipeline.RetrievalQA") as MockQA, \
              patch("app.core.rag_pipeline.build_reranking_retriever"):
             MockQA.from_chain_type.return_value = mock_chain
@@ -343,12 +343,12 @@ class TestBuildPipeline:
     def test_two_different_pipeline_names_produce_different_collections(self, sample_chunks, mock_vectordb, mock_chain):
         collections = []
 
-        def capture_collection(**kwargs):
+        def capture_collection(*args, **kwargs):
             collections.append(kwargs["collection_name"])
             return mock_vectordb
 
         with patch("app.core.rag_pipeline.build_vectordb", side_effect=capture_collection), \
-             patch("app.core.rag_pipeline.ChatOpenAI"), \
+             patch("app.core.rag_pipeline.GroqLLM"), \
              patch("app.core.rag_pipeline.RetrievalQA") as MockQA, \
              patch("app.core.rag_pipeline.build_reranking_retriever"):
             MockQA.from_chain_type.return_value = mock_chain

@@ -19,11 +19,14 @@ Pattern:
 import json
 import logging
 from datetime import datetime, timezone
+from pathlib import Path
 
 from fastapi import APIRouter, BackgroundTasks, HTTPException, Request
 from fastapi.responses import StreamingResponse
 from slowapi import Limiter
 from slowapi.util import get_remote_address
+
+from app.config import PROJECT_ROOT
 
 from app.schemas.eval_schema import (
     SingleEvalRequest, SingleEvalResponse,
@@ -215,18 +218,41 @@ async def evaluate_batch_endpoint(
     Starts a background batch evaluation job.
     Returns a job_id immediately — don't wait for evaluation to finish.
 
+    Supports both local internal pipelines and external RAG pipeline services.
+
+    Example request body for internal pipeline:
+    {
+        "pipeline_name": "recursive-rerank",
+        "pipeline_type": "internal",
+        "pdf_path": "path/to/document.pdf",
+        "test_dataset_path": "eval/test_dataset.json"
+    }
+
+    Example request body for external pipeline:
+    {
+        "pipeline_name": "external-demo",
+        "pipeline_type": "external",
+        "external_pipeline_url": "http://localhost:9000/pipeline",
+        "test_dataset_path": "eval/test_dataset.json"
+    }
+
     The client should then open:
         GET /api/evaluate/stream/{job_id}
     to receive live progress via Server-Sent Events.
     """
     # Load test dataset from disk
     import aiofiles
+
+    test_dataset_path = Path(body.test_dataset_path)
+    if not test_dataset_path.is_absolute():
+        test_dataset_path = PROJECT_ROOT / test_dataset_path
+
     try:
-        async with aiofiles.open(body.test_dataset_path, "r") as f:
+        async with aiofiles.open(test_dataset_path, "r") as f:
             raw = await f.read()
         test_dataset = json.loads(raw)
     except FileNotFoundError:
-        raise HTTPException(status_code=404, detail=f"Test dataset not found: {body.test_dataset_path}")
+        raise HTTPException(status_code=404, detail=f"Test dataset not found: {test_dataset_path}")
     except json.JSONDecodeError:
         raise HTTPException(status_code=422, detail="Test dataset is not valid JSON")
 

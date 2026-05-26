@@ -25,7 +25,7 @@ class InternalPipelineRunner(PipelineRunner):
         retriever_mode: str = "rerank",
         top_k_fetch: int = 20,
         top_n_return: int = 4,
-        llm_model: str = "gpt-4o-mini",
+        llm_model: str = "groq-1",
     ):
         self.pdf_path = pdf_path
         self.pipeline_name = pipeline_name

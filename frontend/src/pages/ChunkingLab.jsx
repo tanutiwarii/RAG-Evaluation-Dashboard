@@ -33,8 +33,8 @@ const now = () =>
 
 export function ChunkingLabPage({ setGlobalStatus }) {
   const [form, setForm] = useState({
-    pdf_path: "eval/sample_docs/sample.pdf",
-    dataset_path: "eval/test_dataset.json",
+    pdf_path: "Eval/sample_docs/sample.pdf",
+    dataset_path: "Eval/test_dataset.json",
     chunk_size: 512,
   });
   const [running, setRunning]   = useState(false);

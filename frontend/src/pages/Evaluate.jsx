@@ -26,7 +26,7 @@ export function EvaluatePage({ setGlobalStatus }) {
     pdf_path: "",
     external_pipeline_url: "",
     external_pipeline_headers: "",
-    dataset_path: "eval/test_dataset.json",
+    dataset_path: "Eval/test_dataset.json",
   });
 
   const [running, setRunning]     = useState(false);
