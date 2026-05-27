@@ -34,6 +34,7 @@ async def ask_question(
         answer=result["answer"],
         contexts=result["contexts"]
     )
+    metrics["latency"] = result["latency"]
 
     evaluation = Evaluation(
 

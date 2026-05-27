@@ -1,12 +1,25 @@
-from fastapi import APIRouter, UploadFile, File
+from fastapi import (
+    APIRouter,
+    UploadFile,
+    File
+)
+
 import os
+
+from app.services.pdf_service import (
+    extract_text_from_pdf
+)
+
+from app.routes.rag_routes import (
+    rag_pipeline
+)
 
 router = APIRouter()
 
 UPLOAD_DIR = "uploads"
 
-@router.post("/upload")
 
+@router.post("/upload")
 async def upload_pdf(
     file: UploadFile = File(...)
 ):
@@ -22,7 +35,22 @@ async def upload_pdf(
 
         f.write(content)
 
+    print("Extracting PDF text...")
+
+    pdf_text = extract_text_from_pdf(
+        file_path
+    )
+
+    print("Indexing PDF...")
+
+    rag_pipeline.load_pdf(
+        pdf_text
+    )
+
     return {
-        "message": "PDF uploaded successfully",
+
+        "message":
+        "PDF uploaded and indexed successfully",
+
         "filename": file.filename
     }
