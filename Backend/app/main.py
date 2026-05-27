@@ -4,7 +4,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.routes.rag_routes import (
     router as rag_router
 )
-
+from app.routes.upload_routes import (
+    router as upload_router
+)
 app = FastAPI()
 
 app.add_middleware(
@@ -16,3 +18,4 @@ app.add_middleware(
 )
 
 app.include_router(rag_router)
+app.include_router(upload_router)

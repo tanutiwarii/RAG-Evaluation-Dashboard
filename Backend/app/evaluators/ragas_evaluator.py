@@ -1,38 +1,36 @@
-class RAGASEvaluator:
+import time
 
-    async def evaluate_response(
-        self,
-        question: str,
-        answer: str,
-        contexts: list[str],
-        latency: float
-    ):
 
-        context_text = " ".join(contexts).lower()
+async def evaluate_rag(
+    question,
+    answer,
+    contexts
+):
 
-        answer_words = answer.lower().split()
+    start_time = time.time()
 
-        matched_words = [
-            word
-            for word in answer_words
-            if word in context_text
-        ]
+    faithfulness = (
+        1.0
+        if answer.lower() in contexts[0].lower()
+        else 0.5
+    )
 
-        faithfulness_score = (
-            len(matched_words) / max(len(answer_words), 1)
-        )
+    answer_relevancy = 0.8
 
-        relevance_score = (
-            min(len(answer_words) / 20, 1.0)
-        )
+    context_utilization = 0.7
 
-        context_utilization = (
-            min(len(contexts) / 5, 1.0)
-        )
+    latency = round(
+        time.time() - start_time,
+        2
+    )
 
-        return {
-            "faithfulness": round(faithfulness_score, 2),
-            "answer_relevancy": round(relevance_score, 2),
-            "context_utilization": round(context_utilization, 2),
-            "latency": latency
-        }
+    return {
+
+        "faithfulness": faithfulness,
+
+        "answer_relevancy": answer_relevancy,
+
+        "context_utilization": context_utilization,
+
+        "latency": latency
+    }

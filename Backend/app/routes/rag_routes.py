@@ -1,46 +1,77 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends
+from sqlalchemy.orm import Session
 
 from app.rag.pipeline import RAGPipeline
-
-from app.schemas.rag_schema import (
-    AskRequest,
-    AskResponse
-)
+from app.db.supabase_client import supabase
+from fastapi import APIRouter
 
 from app.evaluators.ragas_evaluator import (
-    RAGASEvaluator
+    evaluate_rag
 )
+
+from app.dependencies import get_db
+
+from app.models.evaluation import Evaluation
+
 
 router = APIRouter()
 
 rag_pipeline = RAGPipeline()
 
-ragas_evaluator = RAGASEvaluator()
 
+@router.post("/ask")
+async def ask_question(
+    request: dict,
+    db: Session = Depends(get_db)
+):
 
-@router.post("/ask", response_model=AskResponse)
-async def ask_question(request: AskRequest):
+    question = request["question"]
 
-    try:
+    result = await rag_pipeline.ask(question)
 
-        rag_result = await rag_pipeline.ask(
-            request.question
-        )
+    metrics = await evaluate_rag(
+        question=question,
+        answer=result["answer"],
+        contexts=result["contexts"]
+    )
 
-        metrics = await ragas_evaluator.evaluate_response(
-            question=rag_result["question"],
-            answer=rag_result["answer"],
-            contexts=rag_result["contexts"],
-            latency=rag_result["latency"]
-        )
-        return {
-            **rag_result,
-            "metrics": metrics
-        }
+    evaluation = Evaluation(
 
-    except Exception as e:
+        question=question,
 
-        raise HTTPException(
-            status_code=500,
-            detail=str(e)
-        )
+        answer=result["answer"],
+
+        faithfulness=metrics["faithfulness"],
+
+        answer_relevancy=metrics["answer_relevancy"],
+
+        context_utilization=metrics["context_utilization"],
+
+        latency=metrics["latency"]
+    )
+
+    db.add(evaluation)
+
+    db.commit()
+
+    return {
+
+        "question": question,
+
+        "answer": result["answer"],
+
+        "contexts": result["contexts"],
+
+        "metrics": metrics
+    }
+@router.get("/evaluations")
+async def get_evaluations():
+
+    response = (
+        supabase.table("evaluations")
+        .select("*")
+        .order("created_at", desc=True)
+        .execute()
+    )
+
+    return response.data

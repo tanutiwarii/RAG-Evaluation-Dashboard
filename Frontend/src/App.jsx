@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 import axios from "axios";
 
@@ -23,6 +23,40 @@ function App() {
   const [loading, setLoading] = useState(false);
 
 
+  useEffect(() => {
+
+
+    fetchEvaluations();
+
+    const interval = setInterval(() => {
+
+      fetchEvaluations();
+
+    }, 5000);
+
+    return () => clearInterval(interval);
+
+
+  }, []);
+
+
+  const fetchEvaluations = async () => {
+
+    try {
+
+      const response = await axios.get(
+        "http://127.0.0.1:8000/evaluations"
+      );
+
+      setHistory(response.data);
+
+    } catch (error) {
+
+      console.error(error);
+    }
+  };
+
+
   const askQuestion = async () => {
 
     if (!question) return;
@@ -40,10 +74,7 @@ function App() {
 
       setResult(response.data);
 
-      setHistory((prev) => [
-        response.data,
-        ...prev
-      ]);
+      await fetchEvaluations();
 
     } catch (error) {
 
@@ -147,7 +178,7 @@ function App() {
 
               <LineChart data={history}>
 
-                <XAxis hide />
+                <XAxis dataKey="id" />
 
                 <YAxis />
 
@@ -155,7 +186,7 @@ function App() {
 
                 <Line
                   type="monotone"
-                  dataKey="metrics.latency"
+                  dataKey="latency"
                 />
 
               </LineChart>
@@ -209,31 +240,36 @@ function App() {
                   <p className="font-semibold text-lg">
                     {item.question}
                   </p>
+                  <p className="text-sm text-slate-400 mt-1">
+                    {new Date(item.created_at).toLocaleString("en-IN", {
+                      timeZone: "Asia/Kolkata"
+                    })}
+                  </p>
 
                   <div className="flex flex-wrap gap-6 mt-3 text-sm">
 
                     <span>
                       Faithfulness:
                       {" "}
-                      {item.metrics.faithfulness}
+                      {item.faithfulness}
                     </span>
 
                     <span>
                       Relevancy:
                       {" "}
-                      {item.metrics.answer_relevancy}
+                      {item.answer_relevancy}
                     </span>
 
                     <span>
                       Context:
                       {" "}
-                      {item.metrics.context_utilization}
+                      {item.context_utilization}
                     </span>
 
                     <span>
                       Latency:
                       {" "}
-                      {item.metrics.latency}s
+                      {item.latency}s
                     </span>
 
                   </div>
