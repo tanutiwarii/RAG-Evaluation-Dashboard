@@ -211,7 +211,7 @@ function App() {
                 className="mb-4 p-4 bg-slate-700 rounded-lg"
               >
 
-                {context}
+                {context.content}
 
               </div>
 
