@@ -12,7 +12,7 @@ from app.evaluators.ragas_evaluator import (
 from app.dependencies import get_db
 
 from app.models.evaluation import Evaluation
-
+from fastapi.responses import StreamingResponse
 
 router = APIRouter()
 
@@ -46,10 +46,13 @@ async def ask_question(
 
         answer_relevancy=metrics["answer_relevancy"],
 
-        context_utilization=metrics["context_utilization"],
+        context_precision=metrics["context_precision"],
 
-        latency=metrics["latency"]
-    )
+        context_recall=metrics["context_recall"],
+
+        answer_correctness = metrics["answer_correctness"],
+
+        latency=metrics["latency"])
 
     db.add(evaluation)
 
@@ -76,3 +79,15 @@ async def get_evaluations():
     )
 
     return response.data
+
+@router.post("/ask-stream")
+async def ask_question_stream(
+    request: dict
+):
+
+    question = request["question"]
+
+    return StreamingResponse(
+        rag_pipeline.ask_stream(question),
+        media_type="text/plain"
+    )

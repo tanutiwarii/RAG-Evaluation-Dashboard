@@ -9,7 +9,9 @@ class AskRequest(BaseModel):
 class MetricsResponse(BaseModel):
     faithfulness: float
     answer_relevancy: float
-    context_utilization: float
+    context_precision: float
+    context_recall: float
+    answer_correctness: float
     latency: float
 
 class AskResponse(BaseModel):

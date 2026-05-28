@@ -7,6 +7,9 @@ from app.routes.rag_routes import (
 from app.routes.upload_routes import (
     router as upload_router
 )
+from app.routes.chunking_routes import (
+    router as chunking_router
+)
 app = FastAPI()
 
 app.add_middleware(
@@ -19,3 +22,4 @@ app.add_middleware(
 
 app.include_router(rag_router)
 app.include_router(upload_router)
+app.include_router(chunking_router)

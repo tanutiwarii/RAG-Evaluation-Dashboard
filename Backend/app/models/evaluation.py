@@ -23,6 +23,10 @@ class Evaluation(Base):
 
     answer_relevancy = Column(Float)
 
-    context_utilization = Column(Float)
+    context_precision = Column(Float)
+
+    context_recall = Column(Float)
+
+    answer_correctness = Column(Float)
 
     latency = Column(Float)

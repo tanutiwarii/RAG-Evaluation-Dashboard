@@ -44,7 +44,8 @@ async def upload_pdf(
     print("Indexing PDF...")
 
     rag_pipeline.load_pdf(
-        pdf_text
+        pdf_text,
+        file.filename
     )
 
     return {
@@ -53,4 +54,37 @@ async def upload_pdf(
         "PDF uploaded and indexed successfully",
 
         "filename": file.filename
+    }
+@router.get("/documents")
+async def get_documents():
+
+    return {
+        "documents":
+        rag_pipeline.get_loaded_documents()
+    }
+
+
+@router.delete("/documents/{source_name}")
+async def delete_document(
+    source_name: str
+):
+
+    rag_pipeline.remove_document(
+        source_name
+    )
+
+    return {
+        "message":
+        f"{source_name} removed"
+    }
+
+
+@router.delete("/documents")
+async def clear_documents():
+
+    rag_pipeline.clear_knowledge_base()
+
+    return {
+        "message":
+        "Knowledge base cleared"
     }
