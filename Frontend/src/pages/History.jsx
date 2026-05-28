@@ -159,7 +159,7 @@ function History() {
                   <div className="bg-slate-700 p-4 rounded-lg">
 
                     <p className="text-slate-400 text-sm mb-2">
-                      Relevancy
+                      Answer Relevancy
                     </p>
 
                     <p className="text-3xl font-bold">
@@ -171,11 +171,35 @@ function History() {
                   <div className="bg-slate-700 p-4 rounded-lg">
 
                     <p className="text-slate-400 text-sm mb-2">
-                      Context Utilization
+                      Context Precision
                     </p>
 
                     <p className="text-3xl font-bold">
-                      {item.context_utilization}
+                      {item.context_precision}
+                    </p>
+
+                  </div>
+
+                  <div className="bg-slate-700 p-4 rounded-lg">
+
+                    <p className="text-slate-400 text-sm mb-2">
+                      Context Recall
+                    </p>
+
+                    <p className="text-3xl font-bold">
+                      {item.context_recall}
+                    </p>
+
+                  </div>
+
+                  <div className="bg-slate-700 p-4 rounded-lg">
+
+                    <p className="text-slate-400 text-sm mb-2">
+                      Answer Correctness
+                    </p>
+
+                    <p className="text-3xl font-bold">
+                      {item.answer_correctness}
                     </p>
 
                   </div>

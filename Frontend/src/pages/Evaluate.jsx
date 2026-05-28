@@ -119,8 +119,18 @@ function Evaluate() {
               />
 
               <MetricCard
-                title="Context Utilization"
-                value={result.metrics.context_utilization}
+                title="Context Precision"
+                value={result.metrics.context_precision}
+              />
+
+              <MetricCard
+                title="Context Recall"
+                value={result.metrics.context_recall}
+              />
+
+              <MetricCard
+                title="Answer Correctness"
+                value={result.metrics.context_precision}
               />
 
               <MetricCard

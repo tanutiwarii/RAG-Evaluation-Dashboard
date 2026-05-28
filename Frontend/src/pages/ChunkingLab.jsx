@@ -1,5 +1,4 @@
 import { useState } from "react";
-
 import axios from "axios";
 
 import {
@@ -18,517 +17,469 @@ import MetricProgress from "../components/MetricProgress";
 import RadarComparison from "../components/RadarComparison";
 
 function ChunkingLab() {
-
   const [text, setText] = useState("");
-
   const [question, setQuestion] = useState("");
+  const [chunkSize, setChunkSize] = useState(100);
+  const [chunkOverlap, setChunkOverlap] = useState(20);
 
-  const [chunkSize, setChunkSize] =
-    useState(100);
+  const [fixedResult, setFixedResult] = useState(null);
+  const [recursiveResult, setRecursiveResult] = useState(null);
+  const [semanticResult, setSemanticResult] = useState(null);
 
-  const [chunkOverlap, setChunkOverlap] =
-    useState(20);
+  const [loading, setLoading] = useState(false);
+  const [events, setEvents] = useState([]);
 
-  const [fixedResult, setFixedResult] =
-    useState(null);
-
-  const [recursiveResult, setRecursiveResult] =
-    useState(null);
-
-  const [loading, setLoading] =
-    useState(false);
-
+  const addEvent = (message) => {
+    setEvents((prev) => [
+      ...prev,
+      {
+        time: new Date().toLocaleTimeString(),
+        message
+      }
+    ]);
+  };
 
   const runComparison = async () => {
-
     if (!text || !question) return;
 
     try {
-
       setLoading(true);
-
+      setEvents([]);
       setFixedResult(null);
-
       setRecursiveResult(null);
+      setSemanticResult(null);
+
+      addEvent("Starting chunking comparison...");
 
       const fixedResponse = await axios.post(
         "http://127.0.0.1:8000/chunking/evaluate",
         {
           text,
           question,
-
           strategy: "fixed",
-
           chunk_size: Number(chunkSize),
-
           chunk_overlap: Number(chunkOverlap)
         }
       );
+      addEvent("Fixed chunking completed.");
 
-      const recursiveResponse =
-        await axios.post(
-          "http://127.0.0.1:8000/chunking/evaluate",
-          {
-            text,
-            question,
-
-            strategy: "recursive",
-
-            chunk_size: Number(chunkSize),
-
-            chunk_overlap: Number(chunkOverlap)
-          }
-        );
-
-      setFixedResult(
-        fixedResponse.data
+      const recursiveResponse = await axios.post(
+        "http://127.0.0.1:8000/chunking/evaluate",
+        {
+          text,
+          question,
+          strategy: "recursive",
+          chunk_size: Number(chunkSize),
+          chunk_overlap: Number(chunkOverlap)
+        }
       );
+      addEvent("Recursive chunking completed.");
 
-      setRecursiveResult(
-        recursiveResponse.data
+      const semanticResponse = await axios.post(
+        "http://127.0.0.1:8000/chunking/evaluate",
+        {
+          text,
+          question,
+          strategy: "semantic",
+          chunk_size: Number(chunkSize),
+          chunk_overlap: Number(chunkOverlap)
+        }
       );
+      addEvent("Semantic chunking completed.");
 
+      setFixedResult(fixedResponse.data);
+      setRecursiveResult(recursiveResponse.data);
+      setSemanticResult(semanticResponse.data);
+
+      addEvent("Evaluation pipeline finished.");
     } catch (error) {
-
       console.error(error);
-
+      addEvent("Comparison failed. Check backend or console.");
     } finally {
-
       setLoading(false);
     }
   };
 
-
-  const Metric = ({
-    label,
-    value
-  }) => (
-
-    <div className="bg-slate-700 p-4 rounded-lg">
-
-      <p className="text-slate-400 text-sm mb-1">
-        {label}
-      </p>
-
-      <p className="text-2xl font-bold">
-        {value}
-      </p>
-
-    </div>
-  );
-
-
-  const ResultCard = ({
-    title,
-    result
-  }) => {
-
-    if (!result) return null;
-
-    return (
-
-      <div className="bg-slate-800 p-6 rounded-xl shadow-lg">
-
-        <h2 className="text-2xl font-semibold mb-4">
-          {title}
-        </h2>
-
-        <p className="text-slate-400 mb-4">
-          Chunks:
-          {" "}
-          {result.chunk_count}
-        </p>
-
-
-        <div className="grid grid-cols-2 gap-4 mb-6">
-
-          <Metric
-            label="Faithfulness"
-            value={result.metrics.faithfulness}
-          />
-
-          <Metric
-            label="Relevancy"
-            value={result.metrics.answer_relevancy}
-          />
-
-          <Metric
-            label="Context Use"
-            value={result.metrics.context_utilization}
-          />
-
-          <Metric
-            label="Latency"
-            value={`${result.metrics.latency}s`}
-          />
-
-        </div>
-
-
-        <div className="bg-slate-700 p-4 rounded-lg mb-6">
-
-          <h3 className="font-semibold mb-2">
-            Answer
-          </h3>
-
-          <p>
-            {result.answer}
-          </p>
-
-        </div>
-
-
-        <h3 className="text-xl font-semibold mb-3">
-          Retrieved Chunks
-        </h3>
-
-
-        <div className="space-y-3">
-
-          {result.contexts.map((
-            context,
-            index
-          ) => (
-
-            <div
-              key={index}
-              className="bg-slate-700 p-4 rounded-lg"
-            >
-
-              <p className="text-sm text-slate-400 mb-2">
-
-                Chunk ID:
-                {" "}
-                {context.chunk_id}
-
-              </p>
-
-              <p className="max-h-32 overflow-y-auto">
-                {context.content}
-              </p>
-
-            </div>
-
-          ))}
-
-        </div>
-
-      </div>
-    );
-  };
-
-
-  const comparisonData =
-    fixedResult && recursiveResult
-
-      ? [
-
-          {
-            metric: "Faithfulness",
-
-            Fixed:
-              fixedResult.metrics.faithfulness,
-
-            Recursive:
-              recursiveResult.metrics.faithfulness
-          },
-
-          {
-            metric: "Relevancy",
-
-            Fixed:
-              fixedResult.metrics.answer_relevancy,
-
-            Recursive:
-              recursiveResult.metrics.answer_relevancy
-          },
-
-          {
-            metric: "Context",
-
-            Fixed:
-              fixedResult.metrics.context_utilization,
-
-            Recursive:
-              recursiveResult.metrics.context_utilization
-          },
-
-          {
-            metric: "Latency",
-
-            Fixed:
-              fixedResult.metrics.latency,
-
-            Recursive:
-              recursiveResult.metrics.latency
-          }
-
-        ]
-
-      : [];
   const calculateOverallScore = (result) => {
     if (!result) return 0;
 
     return (
       result.metrics.faithfulness +
       result.metrics.answer_relevancy +
-      result.metrics.context_utilization
-    ) / 3;
+      result.metrics.context_precision +
+      result.metrics.context_recall +
+      result.metrics.answer_correctness
+    ) / 5;
   };
 
   const getWinner = () => {
+    if (!fixedResult || !recursiveResult || !semanticResult) return null;
 
-    if (
-      !fixedResult ||
-      !recursiveResult
-    ) return null;
+    const score = (result) =>
+      result.metrics.faithfulness +
+      result.metrics.answer_relevancy +
+      result.metrics.context_precision +
+      result.metrics.context_recall +
+      result.metrics.answer_correctness -
+      result.metrics.latency * 0.05;
 
-    const fixedScore =
+    const scores = [
+      { name: "Fixed Chunking", value: score(fixedResult) },
+      { name: "Recursive Chunking", value: score(recursiveResult) },
+      { name: "Semantic Chunking", value: score(semanticResult) }
+    ];
 
-      fixedResult.metrics.faithfulness +
-
-      fixedResult.metrics.answer_relevancy +
-
-      fixedResult.metrics.context_utilization -
-
-      fixedResult.metrics.latency * 0.05;
-
-
-    const recursiveScore =
-
-      recursiveResult.metrics.faithfulness +
-
-      recursiveResult.metrics.answer_relevancy +
-
-      recursiveResult.metrics.context_utilization -
-
-      recursiveResult.metrics.latency * 0.05;
-
-
-    return recursiveScore >= fixedScore
-
-      ? "Recursive Chunking"
-
-      : "Fixed Chunking";
+    return scores.sort((a, b) => b.value - a.value)[0].name;
   };
 
+  const loadDemoData = () => {
+    setText(
+      "DBMS stands for Database Management System. It helps users store, retrieve, update, and manage data. A database is an organized collection of data. SQL is used to communicate with relational databases. Tables store data in rows and columns. Fields are columns and records are rows. Constraints define rules for data. Normalization reduces redundancy. Transactions follow ACID properties. Indexes improve search performance."
+    );
+
+    setQuestion("What are tables and fields?");
+  };
+
+  const comparisonData =
+    fixedResult && recursiveResult && semanticResult
+      ? [
+          {
+            metric: "F",
+            Fixed: fixedResult.metrics.faithfulness,
+            Recursive: recursiveResult.metrics.faithfulness,
+            Semantic: semanticResult.metrics.faithfulness
+          },
+          {
+            metric: "AR",
+            Fixed: fixedResult.metrics.answer_relevancy,
+            Recursive: recursiveResult.metrics.answer_relevancy,
+            Semantic: semanticResult.metrics.answer_relevancy
+          },
+          {
+            metric: "CP",
+            Fixed: fixedResult.metrics.context_precision,
+            Recursive: recursiveResult.metrics.context_precision,
+            Semantic: semanticResult.metrics.context_precision
+          },
+          {
+            metric: "CR",
+            Fixed: fixedResult.metrics.context_recall,
+            Recursive: recursiveResult.metrics.context_recall,
+            Semantic: semanticResult.metrics.context_recall
+          },
+          {
+            metric: "AC",
+            Fixed: fixedResult.metrics.answer_correctness,
+            Recursive: recursiveResult.metrics.answer_correctness,
+            Semantic: semanticResult.metrics.answer_correctness
+          }
+        ]
+      : [];
+
+  const ResultCard = ({ title, result, color = "violet" }) => {
+    if (!result) return null;
+
+    const colorMap = {
+      red: "border-red-500/30 text-red-400",
+      violet: "border-violet-500/30 text-violet-400",
+      green: "border-emerald-500/30 text-emerald-400"
+    };
+
+    return (
+      <div className={`card border ${colorMap[color]}`}>
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <h2 className={`text-2xl font-bold ${colorMap[color]}`}>
+              {title}
+            </h2>
+            <p className="text-slate-500 text-sm mt-1">
+              {result.chunk_count} chunks generated
+            </p>
+          </div>
+
+          <div className="pill">{result.strategy}</div>
+        </div>
+
+        <div className="bg-[#171722] p-4 rounded-xl mb-6 border border-[#262638]">
+          <h3 className="text-sm text-slate-500 mb-2 uppercase tracking-wider">
+            Generated Answer
+          </h3>
+          <p className="text-slate-200 leading-relaxed">{result.answer}</p>
+        </div>
+
+        <h3 className="text-lg font-semibold mb-4">Retrieved Chunks</h3>
+
+        <div className="space-y-4">
+          {result.contexts.map((context, index) => (
+            <div
+              key={index}
+              className="bg-[#171722] border border-[#262638] p-4 rounded-xl"
+            >
+              <div className="flex justify-between items-center mb-3">
+                <div className="flex gap-2 flex-wrap">
+
+                  <span className="pill">
+                    Chunk #{context.chunk_id}
+                  </span>
+
+                  <span className="pill">
+                    Rank #{context.rank}
+                  </span>
+
+                  <span className="pill">
+                    Score: {context.score}
+                  </span>
+
+                </div>
+                <div className="flex items-center gap-2">
+
+                  <div
+                    className={`h-2 w-2 rounded-full ${
+                      context.score < 1.05
+                        ? "bg-green-400"
+                        : context.score < 1.2
+                        ? "bg-yellow-400"
+                        : "bg-red-400"
+                    }`}
+                  />
+
+                  <span className="text-xs text-slate-500 mono">
+                    {context.strategy}
+                  </span>
+
+                </div>
+              </div>
+
+              <p className="text-sm text-slate-300 max-h-32 overflow-y-auto leading-relaxed">
+                {context.content}
+              </p>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  };
 
   return (
-
     <div>
+      <div className="mb-8">
+        <h3 className="text-xl font-semibold mb-2">
+          Experiment Configuration
+        </h3>
 
-      <h1 className="text-5xl font-bold mb-4">
-        Chunking Lab
-      </h1>
+        <p className="text-slate-500">
+          Compare fixed-size, recursive, and semantic chunking across RAG
+          evaluation dimensions.
+        </p>
+      </div>
 
-      <p className="text-slate-400 mb-8">
-
-        Compare fixed and recursive chunking
-        strategies using real RAG evaluation.
-
-      </p>
-
-
-      <div className="bg-slate-800 p-6 rounded-xl shadow-lg mb-8">
-
+      <div className="card mb-8">
         <textarea
           placeholder="Paste document text here..."
           className="w-full h-48 p-4 rounded-lg text-black mb-4"
-
           value={text}
-
-          onChange={(e) =>
-            setText(e.target.value)
-          }
+          onChange={(e) => setText(e.target.value)}
         />
-
 
         <input
           type="text"
-
           placeholder="Evaluation question..."
-
           className="w-full p-4 rounded-lg text-black mb-4"
-
           value={question}
-
-          onChange={(e) =>
-            setQuestion(e.target.value)
-          }
+          onChange={(e) => setQuestion(e.target.value)}
         />
 
-
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-
           <input
             type="number"
-
             className="p-4 rounded-lg text-black"
-
             value={chunkSize}
-
-            onChange={(e) =>
-              setChunkSize(e.target.value)
-            }
-
+            onChange={(e) => setChunkSize(e.target.value)}
             placeholder="Chunk size"
           />
 
-
           <input
             type="number"
-
             className="p-4 rounded-lg text-black"
-
             value={chunkOverlap}
-
-            onChange={(e) =>
-              setChunkOverlap(e.target.value)
-            }
-
+            onChange={(e) => setChunkOverlap(e.target.value)}
             placeholder="Chunk overlap"
           />
-
         </div>
-
 
         <button
           onClick={runComparison}
-
           className="bg-violet-600 hover:bg-violet-700 px-6 py-3 rounded-lg font-semibold"
         >
-
-          {loading
-            ? "Running Comparison..."
-            : "Run Comparison"}
-
+          {loading ? "Running Comparison..." : "Run Comparison"}
         </button>
 
+        <button
+          onClick={loadDemoData}
+          className="ml-3 px-6 py-3 rounded-lg font-semibold border border-[#383850] text-slate-300 hover:bg-[#1a1a24]"
+        >
+          Load Demo Data
+        </button>
       </div>
 
+      {events.length > 0 && loading && (
+        <div className="card mb-8">
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <div className="card-title">Live Event Stream</div>
+              <p className="text-slate-500 text-sm mt-2">
+                Real-time evaluation and retrieval events.
+              </p>
+            </div>
 
-      {fixedResult && recursiveResult && (
-
-        <>
-
-          {/* Winner Card */}
-
-          <div className="bg-violet-600 p-6 rounded-xl shadow-lg mb-8">
-
-            <h2 className="text-2xl font-bold mb-2">
-
-              Best Strategy:
-              {" "}
-              {getWinner()}
-
-            </h2>
-
-            <p className="text-violet-100">
-
-              Based on faithfulness,
-              relevancy,
-              context utilization,
-              and latency.
-
-            </p>
-
+            <div className="pill">LIVE</div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+          <div className="bg-[#0f0f17] border border-[#262638] rounded-xl p-4 max-h-64 overflow-y-auto space-y-3">
+            {events.map((event, index) => (
+              <div
+                key={index}
+                className="flex items-start gap-4 text-sm border-b border-[#1d1d28] pb-3"
+              >
+                <span className="mono text-slate-500">{event.time}</span>
+                <span className="text-slate-300">{event.message}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {fixedResult && recursiveResult && semanticResult && (
+        <>
+          <div className="card mb-8 border border-violet-500/30 bg-violet-500/5">
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="card-title">Recommended Strategy</div>
+
+                <h2 className="text-3xl font-bold text-violet-300">
+                  {getWinner()}
+                </h2>
+
+                <p className="text-slate-400 mt-2">
+                  Selected using faithfulness, answer relevancy, context
+                  precision, context recall, answer correctness, and latency
+                  penalty.
+                </p>
+              </div>
+
+              <div className="h-16 w-16 rounded-2xl bg-gradient-to-br from-violet-500 to-cyan-400 flex items-center justify-center text-3xl">
+                🏆
+              </div>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
             <StrategyCard
-              name="fixed"
+              name="Fixed Chunking"
               score={calculateOverallScore(fixedResult)}
               chunkCount={fixedResult.chunk_count}
               latency={fixedResult.metrics.latency}
+              metrics={fixedResult.metrics}
               color="red"
             />
 
             <StrategyCard
-              name="recursive"
+              name="Recursive Chunking"
               score={calculateOverallScore(recursiveResult)}
               chunkCount={recursiveResult.chunk_count}
               latency={recursiveResult.metrics.latency}
+              metrics={recursiveResult.metrics}
               color="violet"
             />
+
+            <StrategyCard
+              name="Semantic Chunking"
+              score={calculateOverallScore(semanticResult)}
+              chunkCount={semanticResult.chunk_count}
+              latency={semanticResult.metrics.latency}
+              metrics={semanticResult.metrics}
+              color="green"
+            />
           </div>
-          {/* Comparison Chart */}
 
-          <div className="bg-slate-800 p-6 rounded-xl shadow-lg mb-8">
+          <div className="grid grid-cols-1 xl:grid-cols-2 gap-8 mb-8">
 
-            <h2 className="text-2xl font-semibold mb-6">
-              Strategy Comparison
-            </h2>
+            <div className="card">
 
-            <ResponsiveContainer
-              width="100%"
-              height={350}
-            >
+              <div className="flex items-center justify-between mb-6">
+                <div>
+                  <div className="card-title">Score by Metric</div>
 
-              <BarChart data={comparisonData}>
+                  <p className="text-slate-500 text-sm mt-2">
+                    Compare strategy performance across all RAG dimensions.
+                  </p>
+                </div>
 
-                <CartesianGrid
-                  strokeDasharray="3 3"
-                />
+                <div className="pill">LIVE COMPARISON</div>
+              </div>
 
-                <XAxis dataKey="metric" />
+              <ResponsiveContainer width="100%" height={260}>
+                <BarChart data={comparisonData}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#232336" />
+                  <XAxis dataKey="metric" stroke="#7a7a92" />
+                  <YAxis stroke="#7a7a92" />
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: "#111118",
+                      border: "1px solid #2a2a38",
+                      borderRadius: "12px",
+                      color: "#fff"
+                    }}
+                  />
+                  <Legend />
 
-                <YAxis />
+                  <Bar dataKey="Fixed" fill="#ef4444" radius={[6, 6, 0, 0]} />
+                  <Bar dataKey="Recursive" fill="#8b5cf6" radius={[6, 6, 0, 0]} />
+                  <Bar dataKey="Semantic" fill="#10b981" radius={[6, 6, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
 
-                <Tooltip />
+            </div>
 
-                <Legend />
-
-                <Bar
-                  dataKey="Fixed"
-                  fill="#ef4444"
-                />
-
-                <Bar
-                  dataKey="Recursive"
-                  fill="#8b5cf6"
-                />
-
-              </BarChart>
-
-            </ResponsiveContainer>
-
-          </div>
-          <div className="mb-8">
             <RadarComparison
               fixed={fixedResult.metrics}
               recursive={recursiveResult.metrics}
+              semantic={semanticResult.metrics}
             />
+
           </div>
 
           <div className="mb-8">
             <MetricProgress
               fixed={fixedResult.metrics}
               recursive={recursiveResult.metrics}
+              semantic={semanticResult.metrics}
             />
           </div>
-          {/* Result Cards */}
 
-          <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
-
+          <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
             <ResultCard
               title="Fixed Chunking"
               result={fixedResult}
+              color="red"
             />
 
             <ResultCard
               title="Recursive Chunking"
               result={recursiveResult}
+              color="violet"
             />
 
-          </div>
-
-        </>
-
-      )}
-
-    </div>
-  );
-}
-
+            <ResultCard
+              title="Semantic Chunking"
+              result={semanticResult}
+              color="green" 
+              /> 
+            </div> 
+          </> 
+        )} 
+      </div> 
+    );
+  }
 
 export default ChunkingLab;
