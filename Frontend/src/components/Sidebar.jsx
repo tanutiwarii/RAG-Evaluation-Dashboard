@@ -17,7 +17,7 @@ function Sidebar({
 
     {
       id: "history",
-      label: "📊 History"
+      label: "📊 Insights"
     },
 
     {

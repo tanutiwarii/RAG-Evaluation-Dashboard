@@ -69,3 +69,13 @@ body {
   font-size: 12px;
   font-family: var(--mono);
 }
+
+input[type="number"] {
+  color-scheme: dark;
+}
+
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  opacity: 1;
+  filter: invert(70%) sepia(60%) saturate(1200%) hue-rotate(220deg);
+}

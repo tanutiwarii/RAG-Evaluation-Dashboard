@@ -29,6 +29,8 @@ function ChunkingLab() {
   const [loading, setLoading] = useState(false);
   const [events, setEvents] = useState([]);
 
+  const [groundTruth, setGroundTruth] = useState("");
+
   const addEvent = (message) => {
     setEvents((prev) => [
       ...prev,
@@ -51,47 +53,30 @@ function ChunkingLab() {
 
       addEvent("Starting chunking comparison...");
 
-      const fixedResponse = await axios.post(
-        "http://127.0.0.1:8000/chunking/evaluate",
+      const response = await axios.post(
+        "http://127.0.0.1:8000/chunking/compare",
         {
           text,
           question,
-          strategy: "fixed",
+          ground_truth:groundTruth,
           chunk_size: Number(chunkSize),
           chunk_overlap: Number(chunkOverlap)
         }
       );
+
       addEvent("Fixed chunking completed.");
-
-      const recursiveResponse = await axios.post(
-        "http://127.0.0.1:8000/chunking/evaluate",
-        {
-          text,
-          question,
-          strategy: "recursive",
-          chunk_size: Number(chunkSize),
-          chunk_overlap: Number(chunkOverlap)
-        }
-      );
       addEvent("Recursive chunking completed.");
-
-      const semanticResponse = await axios.post(
-        "http://127.0.0.1:8000/chunking/evaluate",
-        {
-          text,
-          question,
-          strategy: "semantic",
-          chunk_size: Number(chunkSize),
-          chunk_overlap: Number(chunkOverlap)
-        }
-      );
       addEvent("Semantic chunking completed.");
 
-      setFixedResult(fixedResponse.data);
-      setRecursiveResult(recursiveResponse.data);
-      setSemanticResult(semanticResponse.data);
+      setFixedResult(response.data.fixed);
+      setRecursiveResult(response.data.recursive);
+      setSemanticResult(response.data.semantic);
+
+      addEvent(`Winner selected: ${response.data.winner}`);
 
       addEvent("Evaluation pipeline finished.");
+
+      
     } catch (error) {
       console.error(error);
       addEvent("Comparison failed. Check backend or console.");
@@ -276,7 +261,7 @@ function ChunkingLab() {
       <div className="card mb-8">
         <textarea
           placeholder="Paste document text here..."
-          className="w-full h-48 p-4 rounded-lg text-black mb-4"
+          className="w-full h-48 p-4 rounded-2xl bg-[#111118] border border-[#2a2a38] text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-violet-500 mb-4"
           value={text}
           onChange={(e) => setText(e.target.value)}
         />
@@ -284,27 +269,67 @@ function ChunkingLab() {
         <input
           type="text"
           placeholder="Evaluation question..."
-          className="w-full p-4 rounded-lg text-black mb-4"
+          className="w-full p-4 rounded-2xl bg-[#111118] border border-[#2a2a38] text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-violet-500 mb-4"
           value={question}
           onChange={(e) => setQuestion(e.target.value)}
         />
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-          <input
-            type="number"
-            className="p-4 rounded-lg text-black"
-            value={chunkSize}
-            onChange={(e) => setChunkSize(e.target.value)}
-            placeholder="Chunk size"
-          />
+        <div className="card mb-6">
+          <div className="card-title mb-2">
+            Ground Truth Answer
+          </div>
 
-          <input
-            type="number"
-            className="p-4 rounded-lg text-black"
-            value={chunkOverlap}
-            onChange={(e) => setChunkOverlap(e.target.value)}
-            placeholder="Chunk overlap"
+          <p className="text-slate-500 text-sm mb-4">
+            Optional. Used to evaluate answer correctness against an expected answer.
+          </p>
+
+          <textarea
+            value={groundTruth}
+            onChange={(e) => setGroundTruth(e.target.value)}
+            rows={4}
+            placeholder="Example: Tables store data in rows and columns. Fields are columns within a table."
+            className="w-full bg-[#111118] border border-[#2a2a38] rounded-xl p-4 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-violet-500"
           />
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-6">
+
+          <div>
+            <label className="block text-sm font-bold tracking-widest text-slate-400 uppercase mb-2">
+              Chunk Size
+            </label>
+
+            <p className="text-slate-500 text-sm mb-4">
+              Maximum characters per chunk
+            </p>
+
+            <input
+              type="number"
+              value={chunkSize}
+              onChange={(e) => setChunkSize(e.target.value)}
+              className="w-full p-6 rounded-2xl bg-[#111118] border border-[#383850] text-white text-2xl font-bold focus:outline-none focus:ring-2 focus:ring-violet-500 accent-violet-500"
+              placeholder="Chunk size"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-bold tracking-widest text-slate-400 uppercase mb-2">
+              Chunk Overlap
+            </label>
+
+            <p className="text-slate-500 text-sm mb-4">
+              Overlap characters between chunks
+            </p>
+
+            <input
+              type="number"
+              value={chunkOverlap}
+              onChange={(e) => setChunkOverlap(e.target.value)}
+              className="w-full p-6 rounded-2xl bg-[#111118] border border-[#383850] text-white text-2xl font-bold focus:outline-none focus:ring-2 focus:ring-violet-500 accent-violet-500"
+              placeholder="Chunk overlap"
+            />
+          </div>
+
         </div>
 
         <button

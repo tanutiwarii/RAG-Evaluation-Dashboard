@@ -65,7 +65,7 @@ function App() {
                 : "bg-[#171722] hover:bg-[#202030]"
             }`}
           >
-            History
+            Insights
           </button>
 
           <button
@@ -99,12 +99,12 @@ function App() {
               <h2 className="text-3xl font-bold">
                 {currentPage === "evaluate" && "RAG Evaluation"}
                 {currentPage === "chunking" && "Chunking Strategy Lab"}
-                {currentPage === "history" && "Evaluation History"}
+                {currentPage === "history" && "Evaluation Insights"}
                 {currentPage === "upload" && "Knowledge Base"}
               </h2>
 
               <p className="text-slate-500 mt-1">
-                AI Infrastructure Dashboard
+                Track experiment runs, compare chunking strategies, and analyze performance trends over time.
               </p>
 
             </div>
