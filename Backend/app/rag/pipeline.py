@@ -58,7 +58,7 @@ class RAGPipeline:
         print("Loading documents...")
 
         loader = TextLoader(
-            "data/company_policy.txt"
+            "app/data/company_policy.txt"
         )
 
         documents = loader.load()

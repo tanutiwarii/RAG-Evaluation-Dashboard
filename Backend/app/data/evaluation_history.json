@@ -1,1 +1,447 @@
-[]
+[
+  {
+    "run_id": "run_1780064084.17801",
+    "timestamp": "2026-05-29T19:44:44.178029",
+    "question": "Gender Bias in Neural Natural Language Processing?",
+    "chunk_size": 100,
+    "chunk_overlap": 20,
+    "ground_truth": "",
+    "winner": "Semantic Chunking",
+    "strategies": {
+      "fixed": {
+        "strategy": "fixed",
+        "chunk_count": 6,
+        "answer": "The context indicates that there is a concern about models trained on human language texts possibly exhibiting bias based on gender or other characteristics. It suggests that this bias should be mitigated, although it does not provide specific strategies for mitigation.",
+        "contexts": [
+          {
+            "content": "hey exhibit bias based on gender or other characteristics, and, if so, how should this\nbias be mitig",
+            "chunk_id": 4,
+            "strategy": "fixed",
+            "rank": 1,
+            "score": 0.7675
+          },
+          {
+            "content": "these models are trained on human language texts, natural\nquestion is whether they exhibit bias bas",
+            "chunk_id": 3,
+            "strategy": "fixed",
+            "rank": 2,
+            "score": 0.7969
+          },
+          {
+            "content": "Natural language processing (NLP) with neural networks has grown in importance over last few years.",
+            "chunk_id": 0,
+            "strategy": "fixed",
+            "rank": 3,
+            "score": 1.1709
+          }
+        ],
+        "metrics": {
+          "faithfulness": 0.41,
+          "answer_relevancy": 0.65,
+          "context_precision": 0.0,
+          "context_recall": 0.53,
+          "answer_correctness": 0.5,
+          "latency": 3.13
+        }
+      },
+      "recursive": {
+        "strategy": "recursive",
+        "chunk_count": 7,
+        "answer": "The context does not provide specific details on gender bias in neural natural language processing. It only mentions a question about whether bias is exhibited based on gender or other characteristics and indicates that models are trained on human language texts.",
+        "contexts": [
+          {
+            "content": "question is whether they exhibit bias based on gender or other characteristics, and, if so, how",
+            "chunk_id": 4,
+            "strategy": "recursive",
+            "rank": 1,
+            "score": 0.7221
+          },
+          {
+            "content": "and machine translation. However, since these models are trained on human language texts, natural",
+            "chunk_id": 3,
+            "strategy": "recursive",
+            "rank": 2,
+            "score": 1.1379
+          },
+          {
+            "content": "Natural language processing (NLP) with neural networks has grown in importance over last few years.",
+            "chunk_id": 0,
+            "strategy": "recursive",
+            "rank": 3,
+            "score": 1.1709
+          }
+        ],
+        "metrics": {
+          "faithfulness": 0.58,
+          "answer_relevancy": 1.0,
+          "context_precision": 0.0,
+          "context_recall": 0.65,
+          "answer_correctness": 0.75,
+          "latency": 2.37
+        }
+      },
+      "semantic": {
+        "strategy": "semantic",
+        "chunk_count": 2,
+        "answer": "The context mentions that the state-of-the-art models for tasks such as coreference resolution, language modeling, and machine translation may exhibit bias based on gender or other characteristics. It also indicates that the paper addresses the question of how to mitigate this bias.",
+        "contexts": [
+          {
+            "content": "They provide state-of-the-art(SOTA) models for tasks like coreference resolution, language modeling,\nand machine translation. However, since these models are trained on human language texts, natural\nquestion is whether they exhibit bias based on gender or other characteristics, and, if so, how should this\nbias be mitigated. This is a question that we address in this paper.",
+            "chunk_id": 1,
+            "strategy": "semantic",
+            "rank": 1,
+            "score": 0.574
+          },
+          {
+            "content": "Natural language processing (NLP) with neural networks has grown in importance over last few years.",
+            "chunk_id": 0,
+            "strategy": "semantic",
+            "rank": 2,
+            "score": 1.1709
+          }
+        ],
+        "metrics": {
+          "faithfulness": 0.69,
+          "answer_relevancy": 0.65,
+          "context_precision": 0.5,
+          "context_recall": 0.67,
+          "answer_correctness": 0.68,
+          "latency": 2.91
+        }
+      }
+    }
+  },
+  {
+    "run_id": "run_1780053401.977645",
+    "timestamp": "2026-05-29T16:46:41.977675",
+    "question": "What is Data Embedding Learning?",
+    "chunk_size": 100,
+    "chunk_overlap": 20,
+    "winner": "Semantic Chunking",
+    "strategies": {
+      "fixed": {
+        "strategy": "fixed",
+        "chunk_count": 14,
+        "answer": "The provided context does not contain a definition or explanation for Data Embedding Learning.",
+        "contexts": [
+          {
+            "content": "the learning process, embeddings are not trained to\nan optimal point, which can result in suboptimal",
+            "chunk_id": 12,
+            "strategy": "fixed",
+            "rank": 1,
+            "score": 0.9479
+          },
+          {
+            "content": "e. Because this all are none\noptimization of word embeddings lacks control over the learning process",
+            "chunk_id": 11,
+            "strategy": "fixed",
+            "rank": 2,
+            "score": 1.0506
+          },
+          {
+            "content": "Unsupervised word embeddings have become basis for word representation in NLP tasks. Models such\nas",
+            "chunk_id": 0,
+            "strategy": "fixed",
+            "rank": 3,
+            "score": 1.1262
+          }
+        ],
+        "metrics": {
+          "faithfulness": 0.2,
+          "answer_relevancy": 0.85,
+          "context_precision": 0.0,
+          "context_recall": 0.25,
+          "answer_correctness": 0.46,
+          "latency": 68.17
+        }
+      },
+      "recursive": {
+        "strategy": "recursive",
+        "chunk_count": 16,
+        "answer": "The provided context does not contain information about Data Embedding Learning.",
+        "contexts": [
+          {
+            "content": "In supervised NLP(Natural Language Processing) tasks, these unsupervised word embeddings are often",
+            "chunk_id": 7,
+            "strategy": "recursive",
+            "rank": 1,
+            "score": 0.9648
+          },
+          {
+            "content": "optimization of word embeddings lacks control over the learning process, embeddings are not trained",
+            "chunk_id": 13,
+            "strategy": "recursive",
+            "rank": 2,
+            "score": 1.0157
+          },
+          {
+            "content": "semantics of word. However there are certain problems with unsupervised word embeddings, such as",
+            "chunk_id": 3,
+            "strategy": "recursive",
+            "rank": 3,
+            "score": 1.0569
+          }
+        ],
+        "metrics": {
+          "faithfulness": 0.2,
+          "answer_relevancy": 0.85,
+          "context_precision": 0.0,
+          "context_recall": 0.25,
+          "answer_correctness": 0.46,
+          "latency": 2.21
+        }
+      },
+      "semantic": {
+        "strategy": "semantic",
+        "chunk_count": 2,
+        "answer": "The provided context does not define \"Data Embedding Learning.\" It focuses on unsupervised word embeddings in NLP tasks and their characteristics, advantages, and issues.",
+        "contexts": [
+          {
+            "content": "For e.g., words in the same category but with\ndifferent polarities are often confused because those words share common statistics in the corpus. In supervised NLP(Natural Language Processing) tasks, these unsupervised word embeddings are often\nused in one of 2 ways: keeping fixed or using as initialization (fine-tuning). The decision is made based\non amount of available training data in order to avoid overfitting. Nonetheless, underfitting with keeping\nfixed and certain degree of overfitting with fine-tuning is inevitable. Because this all are none\noptimization of word embeddings lacks control over the learning process, embeddings are not trained to\nan optimal point, which can result in suboptimal task performance.",
+            "chunk_id": 1,
+            "strategy": "semantic",
+            "rank": 1,
+            "score": 0.9954
+          },
+          {
+            "content": "Unsupervised word embeddings have become basis for word representation in NLP tasks. Models such\nas skip-gram and Glove capture statistics of large corpus and have good properties that corresponds to\nsemantics of word. However there are certain problems with unsupervised word embeddings, such as\ndifficulty in modeling some fine-grained word semantics.",
+            "chunk_id": 0,
+            "strategy": "semantic",
+            "rank": 2,
+            "score": 1.2617
+          }
+        ],
+        "metrics": {
+          "faithfulness": 0.44,
+          "answer_relevancy": 0.97,
+          "context_precision": 0.5,
+          "context_recall": 0.39,
+          "answer_correctness": 0.65,
+          "latency": 2.65
+        }
+      }
+    }
+  },
+  {
+    "run_id": "run_1780046776.945023",
+    "timestamp": "2026-05-29T14:56:16.945059",
+    "question": "What are tables and fields?",
+    "chunk_size": 100,
+    "chunk_overlap": 20,
+    "winner": "Semantic Chunking",
+    "strategies": {
+      "fixed": {
+        "strategy": "fixed",
+        "chunk_count": 6,
+        "answer": "Tables store data in rows and columns. Fields are the columns in a table.",
+        "contexts": [
+          {
+            "content": "to communicate with relational databases. Tables store data in rows and columns. Fields are columns",
+            "chunk_id": 2,
+            "strategy": "fixed",
+            "rank": 1,
+            "score": 0.5865
+          },
+          {
+            "content": "te, and manage data. A database is an organized collection of data. SQL is used to communicate with",
+            "chunk_id": 1,
+            "strategy": "fixed",
+            "rank": 2,
+            "score": 0.9948
+          },
+          {
+            "content": "Fields are columns and records are rows. Constraints define rules for data. Normalization reduces r",
+            "chunk_id": 3,
+            "strategy": "fixed",
+            "rank": 3,
+            "score": 1.1434
+          }
+        ],
+        "metrics": {
+          "faithfulness": 0.86,
+          "answer_relevancy": 0.8,
+          "context_precision": 0.67,
+          "context_recall": 0.73,
+          "answer_correctness": 0.84,
+          "latency": 2.52
+        }
+      },
+      "recursive": {
+        "strategy": "recursive",
+        "chunk_count": 5,
+        "answer": "Tables store data in rows and columns, where fields are the columns.",
+        "contexts": [
+          {
+            "content": "to communicate with relational databases. Tables store data in rows and columns. Fields are columns",
+            "chunk_id": 2,
+            "strategy": "recursive",
+            "rank": 1,
+            "score": 0.5865
+          },
+          {
+            "content": "and manage data. A database is an organized collection of data. SQL is used to communicate with",
+            "chunk_id": 1,
+            "strategy": "recursive",
+            "rank": 2,
+            "score": 0.9582
+          },
+          {
+            "content": "Fields are columns and records are rows. Constraints define rules for data. Normalization reduces",
+            "chunk_id": 3,
+            "strategy": "recursive",
+            "rank": 3,
+            "score": 1.0457
+          }
+        ],
+        "metrics": {
+          "faithfulness": 1.0,
+          "answer_relevancy": 0.79,
+          "context_precision": 0.67,
+          "context_recall": 0.82,
+          "answer_correctness": 0.92,
+          "latency": 38.9
+        }
+      },
+      "semantic": {
+        "strategy": "semantic",
+        "chunk_count": 2,
+        "answer": "Tables store data in rows and columns. Fields are columns within those tables.",
+        "contexts": [
+          {
+            "content": "Fields are columns and records are rows. Constraints define rules for data. Normalization reduces redundancy. Transactions follow ACID properties. Indexes improve search performance.",
+            "chunk_id": 1,
+            "strategy": "semantic",
+            "rank": 1,
+            "score": 1.0055
+          },
+          {
+            "content": "DBMS stands for Database Management System. It helps users store, retrieve, update, and manage data. A database is an organized collection of data. SQL is used to communicate with relational databases. Tables store data in rows and columns.",
+            "chunk_id": 0,
+            "strategy": "semantic",
+            "rank": 2,
+            "score": 1.0815
+          }
+        ],
+        "metrics": {
+          "faithfulness": 0.75,
+          "answer_relevancy": 0.82,
+          "context_precision": 1.0,
+          "context_recall": 0.62,
+          "answer_correctness": 0.78,
+          "latency": 2.42
+        }
+      }
+    }
+  },
+  {
+    "run_id": "run_1779994698.292507",
+    "timestamp": "2026-05-29T00:28:18.292545",
+    "question": "What are tables and fields?",
+    "chunk_size": 100,
+    "chunk_overlap": 20,
+    "winner": "Semantic Chunking",
+    "strategies": {
+      "fixed": {
+        "strategy": "fixed",
+        "chunk_count": 6,
+        "answer": "Tables store data in rows and columns, where fields are the columns.",
+        "contexts": [
+          {
+            "content": "to communicate with relational databases. Tables store data in rows and columns. Fields are columns",
+            "chunk_id": 2,
+            "strategy": "fixed",
+            "rank": 1,
+            "score": 0.5865
+          },
+          {
+            "content": "te, and manage data. A database is an organized collection of data. SQL is used to communicate with",
+            "chunk_id": 1,
+            "strategy": "fixed",
+            "rank": 2,
+            "score": 0.9948
+          },
+          {
+            "content": "Fields are columns and records are rows. Constraints define rules for data. Normalization reduces r",
+            "chunk_id": 3,
+            "strategy": "fixed",
+            "rank": 3,
+            "score": 1.1434
+          }
+        ],
+        "metrics": {
+          "faithfulness": 1.0,
+          "answer_relevancy": 0.79,
+          "context_precision": 0.67,
+          "context_recall": 0.82,
+          "answer_correctness": 0.92,
+          "latency": 2.81
+        }
+      },
+      "recursive": {
+        "strategy": "recursive",
+        "chunk_count": 5,
+        "answer": "Tables store data in rows and columns. Fields are columns.",
+        "contexts": [
+          {
+            "content": "to communicate with relational databases. Tables store data in rows and columns. Fields are columns",
+            "chunk_id": 2,
+            "strategy": "recursive",
+            "rank": 1,
+            "score": 0.5865
+          },
+          {
+            "content": "and manage data. A database is an organized collection of data. SQL is used to communicate with",
+            "chunk_id": 1,
+            "strategy": "recursive",
+            "rank": 2,
+            "score": 0.9582
+          },
+          {
+            "content": "Fields are columns and records are rows. Constraints define rules for data. Normalization reduces",
+            "chunk_id": 3,
+            "strategy": "recursive",
+            "rank": 3,
+            "score": 1.0457
+          }
+        ],
+        "metrics": {
+          "faithfulness": 1.0,
+          "answer_relevancy": 0.79,
+          "context_precision": 0.67,
+          "context_recall": 0.82,
+          "answer_correctness": 0.92,
+          "latency": 2.84
+        }
+      },
+      "semantic": {
+        "strategy": "semantic",
+        "chunk_count": 2,
+        "answer": "Tables store data in rows and columns, where fields are the columns in those tables.",
+        "contexts": [
+          {
+            "content": "Fields are columns and records are rows. Constraints define rules for data. Normalization reduces redundancy. Transactions follow ACID properties. Indexes improve search performance.",
+            "chunk_id": 1,
+            "strategy": "semantic",
+            "rank": 1,
+            "score": 1.0055
+          },
+          {
+            "content": "DBMS stands for Database Management System. It helps users store, retrieve, update, and manage data. A database is an organized collection of data. SQL is used to communicate with relational databases. Tables store data in rows and columns.",
+            "chunk_id": 0,
+            "strategy": "semantic",
+            "rank": 2,
+            "score": 1.0815
+          }
+        ],
+        "metrics": {
+          "faithfulness": 0.86,
+          "answer_relevancy": 0.8,
+          "context_precision": 1.0,
+          "context_recall": 0.69,
+          "answer_correctness": 0.84,
+          "latency": 2.59
+        }
+      }
+    }
+  }
+]

@@ -143,18 +143,63 @@ def calculate_context_recall(answer: str, contexts: list):
 
     return min(recall, 1.0)
 
+def calculate_answer_correctness(
+    question: str,
+    answer: str,
+    contexts: list,
+    ground_truth: str = ""
+):
+    if ground_truth and ground_truth.strip():
 
-def calculate_answer_correctness(question: str, answer: str, contexts: list):
-    faithfulness = calculate_faithfulness(answer, contexts)
-    relevancy = calculate_answer_relevancy(question, answer)
+        answer_tokens = set(tokenize(answer))
+        truth_tokens = set(tokenize(ground_truth))
 
-    return (faithfulness * 0.6 + relevancy * 0.4)
+        if not truth_tokens:
+            return 0.0
+
+        overlap = answer_tokens.intersection(truth_tokens)
+
+        precision = (
+            len(overlap) /
+            max(len(answer_tokens), 1)
+        )
+
+        recall = (
+            len(overlap) /
+            max(len(truth_tokens), 1)
+        )
+
+        if precision + recall == 0:
+            return 0.0
+
+        f1_score = (
+            2 * precision * recall /
+            (precision + recall)
+        )
+
+        return min(f1_score, 1.0)
+
+    faithfulness = calculate_faithfulness(
+        answer,
+        contexts
+    )
+
+    relevancy = calculate_answer_relevancy(
+        question,
+        answer
+    )
+
+    return (
+        faithfulness * 0.6 +
+        relevancy * 0.4
+    )
 
 
 async def evaluate_rag(
     question,
     answer,
-    contexts
+    contexts,
+    ground_truth=""
 ):
     faithfulness = calculate_faithfulness(
         answer,
@@ -180,7 +225,8 @@ async def evaluate_rag(
     answer_correctness = calculate_answer_correctness(
         question,
         answer,
-        contexts
+        contexts,
+        ground_truth
     )
 
     return {
