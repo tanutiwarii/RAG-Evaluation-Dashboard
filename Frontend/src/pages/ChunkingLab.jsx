@@ -15,6 +15,8 @@ import {
 import StrategyCard from "../components/StrategyCard";
 import MetricProgress from "../components/MetricProgress";
 import RadarComparison from "../components/RadarComparison";
+import MetricInfo from "../components/MetricInfo";
+import ChunkViewer from "../components/ChunkViewer";
 
 function ChunkingLab() {
   const [text, setText] = useState("");
@@ -398,6 +400,20 @@ function ChunkingLab() {
             </div>
           </div>
 
+            {groundTruth && (
+              <div className="card mb-6 border border-[#262638]">
+                <div className="card-title mb-2">Ground Truth Reference</div>
+
+                <p className="text-sm text-slate-300 mb-3">
+                  {groundTruth}
+                </p>
+
+                <p className="text-slate-500 text-sm">
+                  Answer correctness is calculated against this expected answer.
+                </p>
+              </div>
+            )}
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
             <StrategyCard
               name="Fixed Chunking"
@@ -475,11 +491,34 @@ function ChunkingLab() {
           </div>
 
           <div className="mb-8">
+            <MetricInfo />
             <MetricProgress
               fixed={fixedResult.metrics}
               recursive={recursiveResult.metrics}
               semantic={semanticResult.metrics}
             />
+          </div>
+
+          <div className="grid grid-cols-1 xl:grid-cols-3 gap-8 mb-8">
+
+            <ChunkViewer
+              title="Fixed Chunks"
+              contexts={fixedResult.contexts}
+              color="red"
+            />
+
+            <ChunkViewer
+              title="Recursive Chunks"
+              contexts={recursiveResult.contexts}
+              color="violet"
+            />
+
+            <ChunkViewer
+              title="Semantic Chunks"
+              contexts={semanticResult.contexts}
+              color="green"
+            />
+
           </div>
 
           <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
