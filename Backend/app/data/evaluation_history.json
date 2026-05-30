@@ -1,5 +1,229 @@
 [
   {
+    "run_id": "run_1780132798.983455",
+    "timestamp": "2026-05-30T14:49:58.983478",
+    "question": "what is feature engineering?",
+    "chunk_size": 100,
+    "chunk_overlap": 20,
+    "ground_truth": "",
+    "winner": "Semantic Chunking",
+    "strategies": {
+      "fixed": {
+        "strategy": "fixed",
+        "chunk_count": 4,
+        "answer": "Feature engineering is the process of using domain knowledge to create features or input variables, which can help increase the predictive power of your models. It is more of an art than a science.",
+        "contexts": [
+          {
+            "content": "Feature engineering is the process of using domain knowl-\nedge to create features or input variables",
+            "chunk_id": 0,
+            "strategy": "fixed",
+            "rank": 1,
+            "score": 0.5216
+          },
+          {
+            "content": "e correctly,\nit can help increase the predictive power of your models.\nFeature engineering is more o",
+            "chunk_id": 2,
+            "strategy": "fixed",
+            "rank": 2,
+            "score": 0.9966
+          },
+          {
+            "content": "ngineering is more of an art than science.",
+            "chunk_id": 3,
+            "strategy": "fixed",
+            "rank": 3,
+            "score": 1.6479
+          }
+        ],
+        "metrics": {
+          "faithfulness": 0.95,
+          "answer_relevancy": 1.0,
+          "context_precision": 0.67,
+          "context_recall": 0.93,
+          "answer_correctness": 0.97,
+          "latency": 3.01
+        }
+      },
+      "recursive": {
+        "strategy": "recursive",
+        "chunk_count": 5,
+        "answer": "Feature engineering is the process of using domain knowledge to create features that can help increase the predictive power of your models. It is more of an art than a science.",
+        "contexts": [
+          {
+            "content": "Feature engineering is the process of using domain knowl-",
+            "chunk_id": 0,
+            "strategy": "recursive",
+            "rank": 1,
+            "score": 0.4667
+          },
+          {
+            "content": "Feature engineering is more of an art than science.",
+            "chunk_id": 4,
+            "strategy": "recursive",
+            "rank": 2,
+            "score": 0.5951
+          },
+          {
+            "content": "it can help increase the predictive power of your models.",
+            "chunk_id": 3,
+            "strategy": "recursive",
+            "rank": 3,
+            "score": 1.4779
+          }
+        ],
+        "metrics": {
+          "faithfulness": 0.83,
+          "answer_relevancy": 0.97,
+          "context_precision": 0.67,
+          "context_recall": 0.88,
+          "answer_correctness": 0.89,
+          "latency": 2.7
+        }
+      },
+      "semantic": {
+        "strategy": "semantic",
+        "chunk_count": 2,
+        "answer": "Feature engineering is the process of using domain knowledge to create features or input variables that help machine learning algorithms perform better.",
+        "contexts": [
+          {
+            "content": "Feature engineering is the process of using domain knowl-\nedge to create features or input variables that help ma-\nchine learning algorithms perform better. Done correctly,\nit can help increase the predictive power of your models.",
+            "chunk_id": 0,
+            "strategy": "semantic",
+            "rank": 1,
+            "score": 0.5161
+          },
+          {
+            "content": "Feature engineering is more of an art than science.",
+            "chunk_id": 1,
+            "strategy": "semantic",
+            "rank": 2,
+            "score": 0.5951
+          }
+        ],
+        "metrics": {
+          "faithfulness": 0.88,
+          "answer_relevancy": 0.94,
+          "context_precision": 1.0,
+          "context_recall": 0.8,
+          "answer_correctness": 0.9,
+          "latency": 2.64
+        }
+      }
+    }
+  },
+  {
+    "run_id": "run_1780065558.394802",
+    "timestamp": "2026-05-29T20:09:18.394816",
+    "question": "What are tables and fields?",
+    "chunk_size": 100,
+    "chunk_overlap": 20,
+    "ground_truth": "Tables store data in rows and columns. Fields are columns in a table.",
+    "winner": "Semantic Chunking",
+    "strategies": {
+      "fixed": {
+        "strategy": "fixed",
+        "chunk_count": 6,
+        "answer": "Tables store data in rows and columns, where fields are the columns.",
+        "contexts": [
+          {
+            "content": "to communicate with relational databases. Tables store data in rows and columns. Fields are columns",
+            "chunk_id": 2,
+            "strategy": "fixed",
+            "rank": 1,
+            "score": 0.5865
+          },
+          {
+            "content": "te, and manage data. A database is an organized collection of data. SQL is used to communicate with",
+            "chunk_id": 1,
+            "strategy": "fixed",
+            "rank": 2,
+            "score": 0.9948
+          },
+          {
+            "content": "Fields are columns and records are rows. Constraints define rules for data. Normalization reduces r",
+            "chunk_id": 3,
+            "strategy": "fixed",
+            "rank": 3,
+            "score": 1.1434
+          }
+        ],
+        "metrics": {
+          "faithfulness": 1.0,
+          "answer_relevancy": 0.79,
+          "context_precision": 0.67,
+          "context_recall": 0.82,
+          "answer_correctness": 0.92,
+          "latency": 2.66
+        }
+      },
+      "recursive": {
+        "strategy": "recursive",
+        "chunk_count": 5,
+        "answer": "Tables store data in rows and columns. Fields are columns.",
+        "contexts": [
+          {
+            "content": "to communicate with relational databases. Tables store data in rows and columns. Fields are columns",
+            "chunk_id": 2,
+            "strategy": "recursive",
+            "rank": 1,
+            "score": 0.5865
+          },
+          {
+            "content": "and manage data. A database is an organized collection of data. SQL is used to communicate with",
+            "chunk_id": 1,
+            "strategy": "recursive",
+            "rank": 2,
+            "score": 0.9582
+          },
+          {
+            "content": "Fields are columns and records are rows. Constraints define rules for data. Normalization reduces",
+            "chunk_id": 3,
+            "strategy": "recursive",
+            "rank": 3,
+            "score": 1.0457
+          }
+        ],
+        "metrics": {
+          "faithfulness": 1.0,
+          "answer_relevancy": 0.79,
+          "context_precision": 0.67,
+          "context_recall": 0.82,
+          "answer_correctness": 0.92,
+          "latency": 2.33
+        }
+      },
+      "semantic": {
+        "strategy": "semantic",
+        "chunk_count": 2,
+        "answer": "Tables store data in rows and columns. Fields are the columns in these tables.",
+        "contexts": [
+          {
+            "content": "Fields are columns and records are rows. Constraints define rules for data. Normalization reduces redundancy. Transactions follow ACID properties. Indexes improve search performance.",
+            "chunk_id": 1,
+            "strategy": "semantic",
+            "rank": 1,
+            "score": 1.0055
+          },
+          {
+            "content": "DBMS stands for Database Management System. It helps users store, retrieve, update, and manage data. A database is an organized collection of data. SQL is used to communicate with relational databases. Tables store data in rows and columns.",
+            "chunk_id": 0,
+            "strategy": "semantic",
+            "rank": 2,
+            "score": 1.0815
+          }
+        ],
+        "metrics": {
+          "faithfulness": 0.86,
+          "answer_relevancy": 0.8,
+          "context_precision": 1.0,
+          "context_recall": 0.69,
+          "answer_correctness": 0.86,
+          "latency": 2.0
+        }
+      }
+    }
+  },
+  {
     "run_id": "run_1780064084.17801",
     "timestamp": "2026-05-29T19:44:44.178029",
     "question": "Gender Bias in Neural Natural Language Processing?",
@@ -218,117 +442,6 @@
           "context_recall": 0.39,
           "answer_correctness": 0.65,
           "latency": 2.65
-        }
-      }
-    }
-  },
-  {
-    "run_id": "run_1780046776.945023",
-    "timestamp": "2026-05-29T14:56:16.945059",
-    "question": "What are tables and fields?",
-    "chunk_size": 100,
-    "chunk_overlap": 20,
-    "winner": "Semantic Chunking",
-    "strategies": {
-      "fixed": {
-        "strategy": "fixed",
-        "chunk_count": 6,
-        "answer": "Tables store data in rows and columns. Fields are the columns in a table.",
-        "contexts": [
-          {
-            "content": "to communicate with relational databases. Tables store data in rows and columns. Fields are columns",
-            "chunk_id": 2,
-            "strategy": "fixed",
-            "rank": 1,
-            "score": 0.5865
-          },
-          {
-            "content": "te, and manage data. A database is an organized collection of data. SQL is used to communicate with",
-            "chunk_id": 1,
-            "strategy": "fixed",
-            "rank": 2,
-            "score": 0.9948
-          },
-          {
-            "content": "Fields are columns and records are rows. Constraints define rules for data. Normalization reduces r",
-            "chunk_id": 3,
-            "strategy": "fixed",
-            "rank": 3,
-            "score": 1.1434
-          }
-        ],
-        "metrics": {
-          "faithfulness": 0.86,
-          "answer_relevancy": 0.8,
-          "context_precision": 0.67,
-          "context_recall": 0.73,
-          "answer_correctness": 0.84,
-          "latency": 2.52
-        }
-      },
-      "recursive": {
-        "strategy": "recursive",
-        "chunk_count": 5,
-        "answer": "Tables store data in rows and columns, where fields are the columns.",
-        "contexts": [
-          {
-            "content": "to communicate with relational databases. Tables store data in rows and columns. Fields are columns",
-            "chunk_id": 2,
-            "strategy": "recursive",
-            "rank": 1,
-            "score": 0.5865
-          },
-          {
-            "content": "and manage data. A database is an organized collection of data. SQL is used to communicate with",
-            "chunk_id": 1,
-            "strategy": "recursive",
-            "rank": 2,
-            "score": 0.9582
-          },
-          {
-            "content": "Fields are columns and records are rows. Constraints define rules for data. Normalization reduces",
-            "chunk_id": 3,
-            "strategy": "recursive",
-            "rank": 3,
-            "score": 1.0457
-          }
-        ],
-        "metrics": {
-          "faithfulness": 1.0,
-          "answer_relevancy": 0.79,
-          "context_precision": 0.67,
-          "context_recall": 0.82,
-          "answer_correctness": 0.92,
-          "latency": 38.9
-        }
-      },
-      "semantic": {
-        "strategy": "semantic",
-        "chunk_count": 2,
-        "answer": "Tables store data in rows and columns. Fields are columns within those tables.",
-        "contexts": [
-          {
-            "content": "Fields are columns and records are rows. Constraints define rules for data. Normalization reduces redundancy. Transactions follow ACID properties. Indexes improve search performance.",
-            "chunk_id": 1,
-            "strategy": "semantic",
-            "rank": 1,
-            "score": 1.0055
-          },
-          {
-            "content": "DBMS stands for Database Management System. It helps users store, retrieve, update, and manage data. A database is an organized collection of data. SQL is used to communicate with relational databases. Tables store data in rows and columns.",
-            "chunk_id": 0,
-            "strategy": "semantic",
-            "rank": 2,
-            "score": 1.0815
-          }
-        ],
-        "metrics": {
-          "faithfulness": 0.75,
-          "answer_relevancy": 0.82,
-          "context_precision": 1.0,
-          "context_recall": 0.62,
-          "answer_correctness": 0.78,
-          "latency": 2.42
         }
       }
     }

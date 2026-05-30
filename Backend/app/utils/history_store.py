@@ -1,30 +1,49 @@
-import json
-import os
 from datetime import datetime
 
-
-history_FILE = (
-    "app/data/evaluation_history.json"
-)
+from app.db.supabase_client import supabase
 
 
-def load_history():
+TABLE_NAME = "evaluation_runs"
 
-    if not os.path.exists(history_FILE):
-        return []
 
-    with open(history_FILE, "r") as file:
-        return json.load(file)
+def load_history(
+    page: int = 1,
+    limit: int = 10
+):
+    start = (page - 1) * limit
+    end = start + limit - 1
+
+    response = (
+        supabase
+        .table(TABLE_NAME)
+        .select("*")
+        .order("created_at", desc=True)
+        .range(start, end)
+        .execute()
+    )
+
+    return [
+        format_run(row)
+        for row in response.data
+    ]
 
 
 def save_run(run_data):
+    supabase.table(TABLE_NAME).insert(run_data).execute()
 
-    history = load_history()
 
-    history.insert(0, run_data)
+def delete_run(run_id: str):
+    supabase.table(TABLE_NAME).delete().eq(
+        "run_id",
+        run_id
+    ).execute()
 
-    with open(history_FILE, "w") as file:
-        json.dump(history, file, indent=2)
+
+def clear_history():
+    supabase.table(TABLE_NAME).delete().neq(
+        "run_id",
+        ""
+    ).execute()
 
 
 def create_run_entry(
@@ -37,18 +56,32 @@ def create_run_entry(
     semantic,
     winner
 ):
-
     return {
         "run_id": f"run_{datetime.now().timestamp()}",
         "timestamp": datetime.now().isoformat(),
         "question": question,
         "chunk_size": chunk_size,
         "chunk_overlap": chunk_overlap,
-        "ground_truth":ground_truth,
+        "ground_truth": ground_truth,
         "winner": winner,
         "strategies": {
             "fixed": fixed,
             "recursive": recursive,
             "semantic": semantic
         }
+    }
+
+
+def format_run(row):
+    strategies = row.get("strategies", {})
+
+    return {
+        "run_id": row.get("run_id"),
+        "timestamp": row.get("timestamp"),
+        "question": row.get("question"),
+        "chunk_size": row.get("chunk_size"),
+        "chunk_overlap": row.get("chunk_overlap"),
+        "ground_truth": row.get("ground_truth"),
+        "winner": row.get("winner"),
+        "strategies": strategies
     }

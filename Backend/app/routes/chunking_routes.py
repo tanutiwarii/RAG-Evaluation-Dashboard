@@ -314,22 +314,35 @@ async def compare_chunking(
     }
 
 @router.get("/history")
-async def get_history():
+async def get_history(
+    page: int = 1,
+    limit: int = 10
+):
+    from app.utils.history_store import load_history
 
-    from app.utils.history_store import (
-        load_history
+    return load_history(
+        page=page,
+        limit=limit
     )
 
-    return load_history()
-
 @router.delete("/history")
-async def clear_history():
+async def clear_history_route():
 
-    import json
+    from app.utils.history_store import clear_history
 
-    with open("app/data/evaluation_history.json", "w") as file:
-        json.dump([], file)
+    clear_history()
 
     return {
-        "message": "history cleared successfully"
+        "message": "History cleared successfully"
+    }
+@router.delete("/history/{run_id}")
+async def delete_history_run(run_id: str):
+
+    from app.utils.history_store import delete_run
+
+    delete_run(run_id)
+
+    return {
+        "message": "Run deleted successfully",
+        "run_id": run_id
     }
