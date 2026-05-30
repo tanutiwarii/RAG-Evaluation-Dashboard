@@ -4,14 +4,12 @@ import MetricInfo from "../components/common/MetricInfo";
 import HistoryHeader from "../components/history/HistoryHeader";
 import RunComparison from "../components/history/RunComparison";
 import HistoryFilters from "../components/history/HistoryFilters";
+import HistoryRunCard from "../components/history/HistoryRunCard";
 import HistoryPagination from "../components/history/HistoryPagination";
 import StrategyLeaderboard from "../components/history/StrategyLeaderboard";
 import HistorySkeleton from "../components/history/HistorySkeleton";
 import HistorySummary from "../components/history/HistorySummary";
 import HistoryCharts from "../components/history/HistoryCharts";
-import SummaryCard from "../components/history/SummaryCard";
-import MetricRow from "../components/history/MetricRow";
-
 function History() {
   const [runs, setRuns] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -364,37 +362,14 @@ function History() {
         onClearHistory={clearhistory}
       />
 
-      <div className="card border border-[#262638] mb-8">
-        <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
-          <input
-            type="text"
-            placeholder="Search experiments by question..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="w-full p-4 rounded-2xl bg-[#111118] border border-[#2a2a38] text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-violet-500"
-          />
-
-          <select
-            value={winnerFilter}
-            onChange={(e) => setWinnerFilter(e.target.value)}
-            className="w-full p-4 rounded-2xl bg-[#111118] border border-[#2a2a38] text-white focus:outline-none focus:ring-2 focus:ring-violet-500"
-          >
-            <option value="all">All Winners</option>
-            <option value="fixed">Fixed Winners</option>
-            <option value="recursive">Recursive Winners</option>
-            <option value="semantic">Semantic Winners</option>
-          </select>
-
-          <select
-            value={sortOrder}
-            onChange={(e) => setSortOrder(e.target.value)}
-            className="w-full p-4 rounded-2xl bg-[#111118] border border-[#2a2a38] text-white focus:outline-none focus:ring-2 focus:ring-violet-500"
-          >
-            <option value="newest">Newest First</option>
-            <option value="oldest">Oldest First</option>
-          </select>
-        </div>
-      </div>
+      <HistoryFilters
+        search={search}
+        setSearch={setSearch}
+        winnerFilter={winnerFilter}
+        setWinnerFilter={setWinnerFilter}
+        sortOrder={sortOrder}
+        setSortOrder={setSortOrder}
+      />
       {runs.length > 0 && (
         <>
         <HistorySummary
@@ -451,271 +426,23 @@ function History() {
 
         {filteredRuns.length > 0 && (
           <div className="space-y-6">
-            {runs.map((run, index) => {
+            {filteredRuns.map((run, index) => {
               const isExpanded = expandedRun === run.run_id;
 
               return (
-                <div
-                  key={index}
-                  className="card border border-[#262638]"
-                >
-                <div className="flex flex-col lg:flex-row lg:justify-between lg:items-start gap-4 mb-6">
-                  <div>
-                    <div className="card-title">
-                      {run.run_id}
-                    </div>
+                <HistoryRunCard
+                  key={run.run_id || index}
+                  run={run}
+                  isExpanded={isExpanded}
+                  selectedRuns={selectedRuns}
+                  getWinnerColor={getWinnerColor}
+                  toggleRunSelection={toggleRunSelection}
+                  setExpandedRun={setExpandedRun}
+                  exportRunAsJson={exportRunAsJson}
+                  deleteRun={deleteRun}
+                />
+              );
 
-                    <h3 className="text-2xl font-semibold mb-2">
-                      {run.question}
-                    </h3>
-
-                    <p className="text-slate-500 text-sm">
-                      {new Date(run.timestamp).toLocaleString()}
-                    </p>
-
-                    <div className="flex flex-wrap gap-3 mt-4">
-                      <span className="pill">
-                        Chunk Size: {run.chunk_size}
-                      </span>
-
-                      <span className="pill">
-                        Overlap: {run.chunk_overlap}
-                      </span>
-
-                      <span
-                        className={`pill ${getWinnerColor(run.winner)}`}
-                      >
-                        Winner: {run.winner}
-                      </span>
-                    </div>
-                  </div>
-
-                  
-
-                  <div className="flex gap-3">
-
-                    <button
-                      onClick={() => toggleRunSelection(run.run_id)}
-                      className={`px-4 py-2 rounded-lg border transition ${
-                        selectedRuns.includes(run.run_id)
-                          ? "border-violet-500 text-violet-300 bg-violet-500/10"
-                          : "border-[#383850] text-slate-300 hover:bg-[#1a1a24]"
-                      }`}
-                    >
-                      {selectedRuns.includes(run.run_id)
-                        ? "Selected"
-                        : "Select"}
-                    </button>
-
-                    <button
-                      onClick={() =>
-                        setExpandedRun(isExpanded ? null : run.run_id)
-                      }
-                      className="px-4 py-2 rounded-lg border border-[#383850] text-slate-300 hover:bg-[#1a1a24] transition"
-                    >
-                      {isExpanded ? "Hide Details" : "View Details"}
-                    </button>
-
-                    <button
-                      onClick={() => exportRunAsJson(run)}
-                      className="px-4 py-2 rounded-lg border border-[#383850] text-slate-300 hover:bg-[#1a1a24] transition"
-                    >
-                      Export JSON
-                    </button>
-
-                    <button
-                      onClick={() => deleteRun(run.run_id)}
-                      className="px-4 py-2 rounded-lg border border-red-500/30 text-red-400 hover:bg-red-500/10 transition"
-                    >
-                      Delete
-                    </button>
-
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  {[
-                    {
-                      label: "Fixed",
-                      data: run.strategies.fixed,
-                      color: "text-red-400"
-                    },
-                    {
-                      label: "Recursive",
-                      data: run.strategies.recursive,
-                      color: "text-violet-400"
-                    },
-                    {
-                      label: "Semantic",
-                      data: run.strategies.semantic,
-                      color: "text-emerald-400"
-                    }
-                  ].map((strategy, idx) => (
-                    <div
-                      key={idx}
-                      className="bg-[#111118] border border-[#262638] rounded-xl p-5"
-                    >
-                      <h4
-                        className={`text-xl font-bold mb-4 ${strategy.color}`}
-                      >
-                        {strategy.label}
-                      </h4>
-
-                      <div className="space-y-3">
-                        <MetricRow
-                          label="Faithfulness"
-                          value={`${(
-                            strategy.data.metrics.faithfulness * 100
-                          ).toFixed(0)}%`}
-                        />
-
-                        <MetricRow
-                          label="Correctness"
-                          value={`${(
-                            strategy.data.metrics.answer_correctness * 100
-                          ).toFixed(0)}%`}
-                        />
-
-                        <MetricRow
-                          label="Latency"
-                          value={`${strategy.data.metrics.latency}s`}
-                        />
-
-                        <MetricRow
-                          label="Chunks"
-                          value={strategy.data.chunk_count}
-                        />
-                      </div>
-                    </div>
-                  ))}
-                </div>
-
-                {isExpanded && (
-                  <div className="mt-8 pt-8 border-t border-[#262638]">
-
-                    <div className="bg-[#111118] border border-[#262638] rounded-xl p-5 mb-6">
-                      <h3 className="text-lg font-bold mb-3">
-                        Ground Truth
-                      </h3>
-
-                      {run.ground_truth ? (
-                        <p className="text-slate-300 leading-relaxed">
-                          {run.ground_truth}
-                        </p>
-                      ) : (
-                        <p className="text-slate-500 italic">
-                          No ground truth provided for this run.
-                        </p>
-                      )}
-                    </div>
-                    <h3 className="text-2xl font-bold mb-6">
-                      Run Details
-                    </h3>
-
-                    <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-                      {[
-                        {
-                          label: "Fixed",
-                          data: run.strategies.fixed,
-                          color: "text-red-400"
-                        },
-                        {
-                          label: "Recursive",
-                          data: run.strategies.recursive,
-                          color: "text-violet-400"
-                        },
-                        {
-                          label: "Semantic",
-                          data: run.strategies.semantic,
-                          color: "text-emerald-400"
-                        }
-                      ].map((strategy, idx) => (
-                        <div
-                          key={idx}
-                          className="bg-[#0f0f17] border border-[#262638] rounded-xl p-5"
-                        >
-                          <h4
-                            className={`text-lg font-bold mb-5 ${strategy.color}`}
-                          >
-                            {strategy.label} Details
-                          </h4>
-
-                          <div className="mb-6">
-                            <p className="text-xs uppercase tracking-wider text-slate-500 mb-2">
-                              Generated Answer
-                            </p>
-
-                            {run.ground_truth && (
-                              <div className="mb-4">
-                                <p className="text-xs uppercase tracking-wider text-slate-500 mb-2">
-                                  Correctness Score
-                                </p>
-
-                                <div className="flex items-center gap-3">
-                                  <div className="w-full bg-[#262638] rounded-full h-2">
-                                    <div
-                                      className="h-2 rounded-full bg-emerald-500"
-                                      style={{
-                                        width: `${
-                                          strategy.data.metrics.answer_correctness * 100
-                                        }%`
-                                      }}
-                                    />
-                                  </div>
-
-                                  <span className="mono text-sm">
-                                    {(
-                                      strategy.data.metrics.answer_correctness * 100
-                                    ).toFixed(0)}%
-                                  </span>
-                                </div>
-                              </div>
-                            )}
-
-                            <p className="text-sm text-slate-300 leading-relaxed">
-                              {strategy.data.answer}
-                            </p>
-                          </div>
-
-                          <div>
-                            <p className="text-xs uppercase tracking-wider text-slate-500 mb-3">
-                              Retrieved Chunks
-                            </p>
-
-                            <div className="space-y-3">
-                              {strategy.data.contexts.map((context, i) => (
-                                <div
-                                  key={i}
-                                  className="bg-[#171722] border border-[#262638] rounded-lg p-3"
-                                >
-                                  <div className="flex flex-wrap gap-2 mb-2">
-                                    <span className="pill">
-                                      Chunk #{context.chunk_id}
-                                    </span>
-
-                                    <span className="pill">
-                                      Rank #{context.rank}
-                                    </span>
-
-                                    <span className="pill">
-                                      Score: {context.score}
-                                    </span>
-                                  </div>
-
-                                  <p className="text-xs text-slate-400 leading-relaxed max-h-24 overflow-y-auto">
-                                    {context.content}
-                                  </p>
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-            );
           })}
           {totalPages > 1 && (
             <HistoryPagination

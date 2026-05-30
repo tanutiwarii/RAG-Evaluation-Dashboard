@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-
+from app.routes.evaluate_routes import router as evaluate_router
 from app.routes.rag_routes import (
     router as rag_router
 )
@@ -23,3 +23,4 @@ app.add_middleware(
 app.include_router(rag_router)
 app.include_router(upload_router)
 app.include_router(chunking_router)
+app.include_router(evaluate_router)

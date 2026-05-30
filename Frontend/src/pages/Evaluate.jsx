@@ -130,7 +130,7 @@ function Evaluate() {
 
               <MetricCard
                 title="Answer Correctness"
-                value={result.metrics.context_precision}
+                value={result.metrics.answer_correctness}
               />
 
               <MetricCard

@@ -13,7 +13,7 @@ def load_history(
     start = (page - 1) * limit
     end = start + limit - 1
 
-    response = (
+    data_response = (
         supabase
         .table(TABLE_NAME)
         .select("*")
@@ -22,10 +22,29 @@ def load_history(
         .execute()
     )
 
-    return [
-        format_run(row)
-        for row in response.data
-    ]
+    count_response = (
+        supabase
+        .table(TABLE_NAME)
+        .select("*", count="exact")
+        .execute()
+    )
+
+    total = count_response.count or 0
+
+    return {
+        "items": [
+            format_run(row)
+            for row in data_response.data
+        ],
+        "page": page,
+        "limit": limit,
+        "total": total,
+        "pages": (
+            (total + limit - 1) // limit
+            if total > 0
+            else 1
+        )
+    }
 
 
 def save_run(run_data):
