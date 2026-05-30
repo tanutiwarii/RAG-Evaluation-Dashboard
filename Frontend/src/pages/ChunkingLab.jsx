@@ -12,11 +12,11 @@ import {
   Legend
 } from "recharts";
 
-import StrategyCard from "../components/StrategyCard";
-import MetricProgress from "../components/MetricProgress";
-import RadarComparison from "../components/RadarComparison";
-import MetricInfo from "../components/MetricInfo";
-import ChunkViewer from "../components/ChunkViewer";
+import StrategyCard from "../components/common/StrategyCard";
+import MetricProgress from "../components/common/MetricProgress";
+import RadarComparison from "../components/common/RadarComparison";
+import MetricInfo from "../components/common/MetricInfo";
+import ChunkViewer from "../components/chunking/ChunkViewer";
 
 function ChunkingLab() {
   const [text, setText] = useState("");

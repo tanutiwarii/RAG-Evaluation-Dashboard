@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import Sidebar from "./components/Sidebar";
+import Sidebar from "./components/layout/Sidebar";
 
 import Evaluate from "./pages/Evaluate";
 import ChunkingLab from "./pages/ChunkingLab";
@@ -110,6 +110,7 @@ function App() {
             </div>
 
             <div className="flex gap-3">
+              
 
               <div className="pill">
                 LIVE

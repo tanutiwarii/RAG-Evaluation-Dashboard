@@ -1,7 +1,7 @@
 import { useState } from "react";
 import axios from "axios";
 
-import MetricCard from "../components/MetricCard";
+import MetricCard from "../components/common/MetricCard";
 
 function Evaluate() {
   const [question, setQuestion] = useState("");
