@@ -1,179 +1,50 @@
 import { useState } from "react";
-import axios from "axios";
 
-import MetricCard from "../components/common/MetricCard";
+import SingleEvalForm from "../components/evaluate/SingleEvalForm";
+import BatchEvalForm from "../components/evaluate/BatchEvalForm";
 
 function Evaluate() {
-  const [question, setQuestion] = useState("");
-  const [result, setResult] = useState(null);
-  const [loading, setLoading] = useState(false);
-
-  const askQuestion = async () => {
-    if (!question) return;
-
-    try {
-      setLoading(true);
-
-      setResult({
-        question,
-        answer: "",
-        contexts: [],
-        metrics: {}
-      });
-
-      const response = await fetch("http://127.0.0.1:8000/ask-stream", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          question
-        })
-      });
-
-      const reader = response.body.getReader();
-      const decoder = new TextDecoder();
-
-      let streamedText = "";
-
-      while (true) {
-        const { done, value } = await reader.read();
-
-        if (done) break;
-
-        streamedText += decoder.decode(value);
-
-        setResult((prev) => ({
-          ...prev,
-          answer: streamedText
-        }));
-      }
-
-      const finalResponse = await axios.post("http://127.0.0.1:8000/ask", {
-        question
-      });
-
-      setResult((prev) => ({
-        ...prev,
-        question: finalResponse.data.question,
-        contexts: finalResponse.data.contexts,
-        metrics: finalResponse.data.metrics
-      }));
-
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const [activeTab, setActiveTab] = useState("single");
 
   return (
     <div>
-      <h1 className="text-5xl font-bold mb-4">
-        Evaluate Pipeline
-      </h1>
+      <div className="mb-10">
+        <h1 className="text-5xl font-bold mb-4">
+          Evaluate Pipeline
+        </h1>
 
-      <p className="text-slate-400 mb-8">
-        Ask questions, stream answers, inspect retrieved contexts, and evaluate quality.
-      </p>
+        <p className="text-sm text-slate-400">
+          Run single-question debugging or production-grade batch evaluation.
+        </p>
+      </div>
 
-      <div className="flex gap-4 mb-10">
-        <input
-          type="text"
-          placeholder="Ask a question..."
-          className="flex-1 p-4 rounded-lg text-black"
-          value={question}
-          onChange={(e) => setQuestion(e.target.value)}
-        />
+      <div className="flex gap-3 mb-8">
+        <button
+          onClick={() => setActiveTab("single")}
+          className={`px-5 py-3 rounded-xl border transition ${
+            activeTab === "single"
+              ? "bg-violet-600 border-violet-500 text-white"
+              : "border-[#383850] text-slate-300 hover:bg-[#1a1a24]"
+          }`}
+        >
+          Single Evaluation
+        </button>
 
         <button
-          onClick={askQuestion}
-          className="bg-blue-600 hover:bg-blue-700 px-8 py-4 rounded-lg font-semibold"
+          onClick={() => setActiveTab("batch")}
+          className={`px-5 py-3 rounded-xl border transition ${
+            activeTab === "batch"
+              ? "bg-violet-600 border-violet-500 text-white"
+              : "border-[#383850] text-slate-300 hover:bg-[#1a1a24]"
+          }`}
         >
-          {loading ? "Evaluating..." : "Evaluate"}
+          Batch Evaluation
         </button>
       </div>
 
-      {result && (
-        <div className="space-y-8">
-          <div className="bg-slate-800 p-6 rounded-xl shadow-lg">
-            <h2 className="text-2xl font-semibold mb-4">
-              Answer
-            </h2>
+      {activeTab === "single" && <SingleEvalForm />}
 
-            <p className="text-lg whitespace-pre-wrap">
-              {result.answer}
-            </p>
-          </div>
-
-          {result.metrics && Object.keys(result.metrics).length > 0 && (
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <MetricCard
-                title="Faithfulness"
-                value={result.metrics.faithfulness}
-              />
-
-              <MetricCard
-                title="Answer Relevancy"
-                value={result.metrics.answer_relevancy}
-              />
-
-              <MetricCard
-                title="Context Precision"
-                value={result.metrics.context_precision}
-              />
-
-              <MetricCard
-                title="Context Recall"
-                value={result.metrics.context_recall}
-              />
-
-              <MetricCard
-                title="Answer Correctness"
-                value={result.metrics.answer_correctness}
-              />
-
-              <MetricCard
-                title="Latency"
-                value={`${result.metrics.latency}s`}
-              />
-            </div>
-          )}
-
-          {result.contexts && result.contexts.length > 0 && (
-            <div className="bg-slate-800 p-6 rounded-xl shadow-lg">
-              <h2 className="text-2xl font-semibold mb-4">
-                Retrieved Contexts
-              </h2>
-
-              {result.contexts.map((context, index) => (
-                <div
-                  key={index}
-                  className="mb-4 p-4 bg-slate-700 rounded-lg"
-                >
-                  <div className="flex justify-between mb-2 text-sm text-slate-400">
-                    <span>
-                      Source: {context.source}
-                    </span>
-
-                    <span>
-                      Chunk ID: {context.chunk_id}
-                    </span>
-
-                    <span>
-                      Score: {context.score}
-                    </span>
-                  </div>
-
-                  <p className="max-h-32 overflow-y-auto">
-                    {context.content}
-                  </p>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      )}
+      {activeTab === "batch" && <BatchEvalForm />}
     </div>
   );
 }

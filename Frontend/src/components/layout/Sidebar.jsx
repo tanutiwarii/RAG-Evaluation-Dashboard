@@ -45,7 +45,7 @@ function Sidebar({
               setCurrentPage(item.id)
             }
 
-            className={`w-full text-left px-5 py-4 rounded-xl transition-all ${
+            className={`w-full text-left px-5 py-2 rounded-xl transition-all ${
               currentPage === item.id
                 ? "bg-violet-600 text-white"
                 : "bg-slate-900 hover:bg-slate-800"

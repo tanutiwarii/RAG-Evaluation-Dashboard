@@ -1,6 +1,7 @@
 from app.evaluators.ragas_evaluator import evaluate_rag
 from app.services.job_manager import update_job
-
+import time
+from app.routes.rag_routes import rag_pipeline
 def format_contexts(contexts):
 
     formatted_contexts = []
@@ -39,11 +40,18 @@ async def run_single_evaluation(item: dict):
 
     formatted_contexts = format_contexts(contexts)
 
+    start_time = time.time()
+
     metrics = await evaluate_rag(
         question=question,
         answer=answer,
         contexts=formatted_contexts,
         ground_truth=ground_truth
+    )
+
+    metrics["latency"] = round(
+        time.time() - start_time,
+        4
     )
 
     return {
@@ -56,14 +64,39 @@ async def run_single_evaluation(item: dict):
 
 async def run_batch_evaluation(
     items: list,
-    job_id: str = None
+    job_id: str = None,
+    mode: str ="manual"
 ):
 
     results = []
 
     for index, item in enumerate(items):
 
-        result = await run_single_evaluation(item)
+        if mode == "pipeline":
+
+            pipeline_result = await rag_pipeline.ask(
+                item["question"]
+            )
+
+            evaluation_item = {
+                "question": item["question"],
+                "answer": pipeline_result["answer"],
+                "contexts": pipeline_result["contexts"],
+                "ground_truth": item.get(
+                    "ground_truth",
+                    ""
+                )
+            }
+
+            result = await run_single_evaluation(
+                evaluation_item
+            )
+
+        else:
+
+            result = await run_single_evaluation(
+                item
+            )
 
         results.append({
             "index": index,

@@ -117,7 +117,7 @@ function Upload() {
 
         <div className="space-y-3">
           {documents.length === 0 && (
-            <p className="text-slate-400">No documents loaded.</p>
+            <p className="text-sm text-slate-400">No documents loaded.</p>
           )}
 
           {documents.map((doc, index) => (

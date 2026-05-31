@@ -21,10 +21,10 @@ function StrategyLeaderboard({ strategyLeaderboard }) {
         <table className="w-full text-sm">
           <thead>
             <tr className="text-slate-500 border-b border-[#262638]">
-              <th className="text-left py-3">Strategy</th>
-              <th className="text-left py-3">Wins</th>
-              <th className="text-left py-3">Avg Correctness</th>
-              <th className="text-left py-3">Avg Latency</th>
+              <th className="text-left py-2 text-xs uppercase tracking-wide text-slate-400">Strategy</th>
+              <th className="text-left py-2 text-xs uppercase tracking-wide text-slate-400">Wins</th>
+              <th className="text-left py-2 text-xs uppercase tracking-wide text-slate-400">Avg Correctness</th>
+              <th className="text-left py-2 text-xs uppercase tracking-wide text-slate-400">Avg Latency</th>
             </tr>
           </thead>
 
@@ -34,19 +34,19 @@ function StrategyLeaderboard({ strategyLeaderboard }) {
                 key={item.strategy}
                 className="border-b border-[#1d1d28]"
               >
-                <td className="py-4 font-semibold">
+                <td className="py-2 font-semibold">
                   {item.label}
                 </td>
 
-                <td className="py-4 mono">
+                <td className="py-2 mono">
                   {item.wins}
                 </td>
 
-                <td className="py-4 mono">
+                <td className="py-2 mono">
                   {item.avgCorrectness.toFixed(1)}%
                 </td>
 
-                <td className="py-4 mono">
+                <td className="py-2 mono">
                   {item.avgLatency.toFixed(2)}s
                 </td>
               </tr>

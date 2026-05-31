@@ -30,7 +30,7 @@ function RunComparison({
         </button>
       </div>
 
-      <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-5">
         {selectedRunObjects.map((run) => (
           <div
             key={run.run_id}

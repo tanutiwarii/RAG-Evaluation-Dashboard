@@ -14,7 +14,7 @@ import {
 
 function HistoryCharts({ trendData, winnerData }) {
   return (
-    <div className="grid grid-cols-1 xl:grid-cols-2 gap-8 mb-10">
+    <div className="grid grid-cols-1 xl:grid-cols-2 gap-5 mb-10">
       <div className="card border border-[#262638]">
         <div className="flex items-center justify-between mb-6">
           <div>

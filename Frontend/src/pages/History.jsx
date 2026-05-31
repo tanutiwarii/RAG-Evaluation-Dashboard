@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+
 import MetricInfo from "../components/common/MetricInfo";
 import HistoryHeader from "../components/history/HistoryHeader";
 import RunComparison from "../components/history/RunComparison";
@@ -10,6 +11,7 @@ import StrategyLeaderboard from "../components/history/StrategyLeaderboard";
 import HistorySkeleton from "../components/history/HistorySkeleton";
 import HistorySummary from "../components/history/HistorySummary";
 import HistoryCharts from "../components/history/HistoryCharts";
+
 function History() {
   const [runs, setRuns] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -18,18 +20,9 @@ function History() {
   const [selectedRuns, setSelectedRuns] = useState([]);
   const [winnerFilter, setWinnerFilter] = useState("all");
   const [sortOrder, setSortOrder] = useState("newest");
-
-  const selectedRunObjects = runs.filter((run) =>
-    selectedRuns.includes(run.run_id)
-  );
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [error, setError] = useState(null);
-  const refreshHistory = async () => {
-    setLoading(true);
-    await fetchHistory(currentPage);
-  };
-  
 
   const fetchHistory = async (page = 1) => {
     try {
@@ -39,23 +32,40 @@ function History() {
         `http://127.0.0.1:8000/history?page=${page}&limit=5`
       );
 
-      setRuns(response.data.items);
-      setTotalPages(response.data.pages);
+      setRuns(response.data.items || []);
+      setTotalPages(response.data.pages || 1);
     } catch (error) {
       console.error(error);
-      setError("Unable to load history. Please check backend or database connection.");
+      setError(
+        "Unable to load history. Please check backend or database connection."
+      );
     } finally {
       setLoading(false);
     }
   };
 
-
   useEffect(() => {
     fetchHistory(currentPage);
   }, [currentPage]);
 
+  const refreshHistory = async () => {
+    setLoading(true);
+    await fetchHistory(currentPage);
+  };
+
+  const comparisonRuns = runs.filter(
+    (run) => run.winner !== "Batch Evaluation"
+  );
+
+  const selectedRunObjects = comparisonRuns.filter((run) =>
+    selectedRuns.includes(run.run_id)
+  );
 
   const getWinnerColor = (winner) => {
+    if (winner?.includes("Batch")) {
+      return "text-blue-400 border-blue-500/30";
+    }
+
     if (winner?.includes("Semantic")) {
       return "text-emerald-400 border-emerald-500/30";
     }
@@ -89,6 +99,7 @@ function History() {
       color: "text-slate-400"
     };
   };
+
   if (error) {
     return (
       <div className="card border border-red-500/30 bg-red-500/5 text-center py-16">
@@ -116,31 +127,32 @@ function History() {
 
   const totalRuns = runs.length;
 
-  const semanticWins = runs.filter((run) =>
+  const semanticWins = comparisonRuns.filter((run) =>
     run.winner?.includes("Semantic")
   ).length;
 
   const avgCorrectness =
-    runs.length > 0
+    comparisonRuns.length > 0
       ? (
-          runs.reduce(
+          comparisonRuns.reduce(
             (sum, run) =>
-              sum + run.strategies.semantic.metrics.answer_correctness,
+              sum +
+              run.strategies.semantic.metrics.answer_correctness,
             0
-          ) / runs.length
+          ) / comparisonRuns.length
         ) * 100
       : 0;
 
   const avgLatency =
-    runs.length > 0
-      ? runs.reduce(
+    comparisonRuns.length > 0
+      ? comparisonRuns.reduce(
           (sum, run) =>
             sum + run.strategies.semantic.metrics.latency,
           0
-        ) / runs.length
+        ) / comparisonRuns.length
       : 0;
 
-  const trendData = [...runs].reverse().map((run, index) => ({
+  const trendData = [...comparisonRuns].reverse().map((run, index) => ({
     run: index + 1,
     fixed_correctness:
       run.strategies.fixed.metrics.answer_correctness,
@@ -153,104 +165,58 @@ function History() {
   const winnerData = [
     {
       name: "Fixed",
-      value: runs.filter((run) =>
+      value: comparisonRuns.filter((run) =>
         run.winner?.includes("Fixed")
       ).length,
       color: "#ef4444"
     },
     {
       name: "Recursive",
-      value: runs.filter((run) =>
+      value: comparisonRuns.filter((run) =>
         run.winner?.includes("Recursive")
       ).length,
       color: "#8b5cf6"
     },
     {
       name: "Semantic",
-      value: runs.filter((run) =>
+      value: comparisonRuns.filter((run) =>
         run.winner?.includes("Semantic")
       ).length,
       color: "#10b981"
     }
   ];
 
-  const exportRunAsJson = (run) => {
-    const blob = new Blob(
-      [JSON.stringify(run, null, 2)],
-      {
-        type: "application/json"
-      }
-    );
-
-    const url = URL.createObjectURL(blob);
-
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = `${run.run_id}.json`;
-    link.click();
-
-    URL.revokeObjectURL(url);
-  };
-
-
-
-  const filteredRuns = runs
-    .filter((run) =>
-      run.question
-        ?.toLowerCase()
-        .includes(search.toLowerCase())
-    )
-    .filter((run) => {
-      if (winnerFilter === "all") return true;
-
-      return run.winner
-        ?.toLowerCase()
-        .includes(winnerFilter);
-    })
-    .sort((a, b) => {
-      if (sortOrder === "newest") {
-        return new Date(b.timestamp) - new Date(a.timestamp);
-      }
-
-      return new Date(a.timestamp) - new Date(b.timestamp);
-    });
-
-
-
-  const strategyLeaderboard = ["fixed", "recursive", "semantic"].map(
-    (strategy) => {
+  const strategyLeaderboard = ["fixed", "recursive", "semantic"]
+    .map((strategy) => {
       const labelMap = {
         fixed: "Fixed",
         recursive: "Recursive",
         semantic: "Semantic"
       };
 
-      const wins = runs.filter((run) =>
-        run.winner
-          ?.toLowerCase()
-          .includes(strategy)
+      const wins = comparisonRuns.filter((run) =>
+        run.winner?.toLowerCase().includes(strategy)
       ).length;
 
       const avgCorrectness =
-        runs.length > 0
+        comparisonRuns.length > 0
           ? (
-              runs.reduce(
+              comparisonRuns.reduce(
                 (sum, run) =>
                   sum +
                   run.strategies[strategy].metrics.answer_correctness,
                 0
-              ) / runs.length
+              ) / comparisonRuns.length
             ) * 100
           : 0;
 
       const avgLatency =
-        runs.length > 0
-          ? runs.reduce(
+        comparisonRuns.length > 0
+          ? comparisonRuns.reduce(
               (sum, run) =>
-                sum +
-                run.strategies[strategy].metrics.latency,
+                sum + run.strategies[strategy].metrics.latency,
               0
-            ) / runs.length
+            ) / comparisonRuns.length
           : 0;
 
       return {
@@ -260,13 +226,33 @@ function History() {
         avgCorrectness,
         avgLatency
       };
-    }
-  );
+    })
+    .sort((a, b) => b.wins - a.wins);
 
-  // Sort leaderboard by number of wins (descending)
-  strategyLeaderboard.sort((a, b) => b.wins - a.wins);
+  const filteredRuns = runs
+    .filter((run) =>
+      run.question?.toLowerCase().includes(search.toLowerCase())
+    )
+    .filter((run) => {
+      if (winnerFilter === "all") return true;
+
+      return run.winner?.toLowerCase().includes(winnerFilter);
+    })
+    .sort((a, b) => {
+      if (sortOrder === "newest") {
+        return new Date(b.timestamp) - new Date(a.timestamp);
+      }
+
+      return new Date(a.timestamp) - new Date(b.timestamp);
+    });
 
   const toggleRunSelection = (runId) => {
+    const run = runs.find((item) => item.run_id === runId);
+
+    if (run?.winner === "Batch Evaluation") {
+      return;
+    }
+
     setSelectedRuns((prev) => {
       if (prev.includes(runId)) {
         return prev.filter((id) => id !== runId);
@@ -280,7 +266,47 @@ function History() {
     });
   };
 
+  const exportRunAsJson = (run) => {
+    const blob = new Blob([JSON.stringify(run, null, 2)], {
+      type: "application/json"
+    });
 
+    const url = URL.createObjectURL(blob);
+
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `${run.run_id}.json`;
+    link.click();
+
+    URL.revokeObjectURL(url);
+  };
+
+  const exportEntireHistory = async () => {
+    try {
+      const response = await axios.get(
+        "http://127.0.0.1:8000/history?page=1&limit=10000"
+      );
+
+      const blob = new Blob(
+        [JSON.stringify(response.data.items || [], null, 2)],
+        {
+          type: "application/json"
+        }
+      );
+
+      const url = URL.createObjectURL(blob);
+
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = "evaluation_history_full.json";
+      link.click();
+
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error(error);
+      window.alert("Failed to export full history.");
+    }
+  };
 
   const clearhistory = async () => {
     const confirmed = window.confirm(
@@ -327,33 +353,6 @@ function History() {
     }
   };
 
-  const exportEntireHistory = async () => {
-    try {
-      const response = await axios.get(
-        "http://127.0.0.1:8000/history?page=1&limit=10000"
-      );
-
-      const blob = new Blob(
-        [JSON.stringify(response.data.items, null, 2)],
-        {
-          type: "application/json"
-        }
-      );
-
-      const url = URL.createObjectURL(blob);
-
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = "evaluation_history_full.json";
-      link.click();
-
-      URL.revokeObjectURL(url);
-    } catch (error) {
-      console.error(error);
-      window.alert("Failed to export full history.");
-    }
-  };
-
   return (
     <div>
       <HistoryHeader
@@ -370,80 +369,85 @@ function History() {
         sortOrder={sortOrder}
         setSortOrder={setSortOrder}
       />
+
       {runs.length > 0 && (
         <>
-        <HistorySummary
-          totalRuns={totalRuns}
-          semanticWins={semanticWins}
-          avgCorrectness={avgCorrectness}
-          avgLatency={avgLatency}
-        />
+          {comparisonRuns.length > 0 && (
+            <>
+              <HistorySummary
+                totalRuns={totalRuns}
+                semanticWins={semanticWins}
+                avgCorrectness={avgCorrectness}
+                avgLatency={avgLatency}
+              />
 
-        <HistoryCharts
-          trendData={trendData}
-          winnerData={winnerData}
-        />
+              <HistoryCharts
+                trendData={trendData}
+                winnerData={winnerData}
+              />
 
-        <MetricInfo />
+              <MetricInfo />
 
-        <StrategyLeaderboard
-          strategyLeaderboard={strategyLeaderboard}
-        />
-        {selectedRunObjects.length === 2 && (
-          <RunComparison
-            selectedRunObjects={selectedRunObjects}
-            getDelta={getDelta}
-            setSelectedRuns={setSelectedRuns}
-          />
-        )}
-        
+              <StrategyLeaderboard
+                strategyLeaderboard={strategyLeaderboard}
+              />
+            </>
+          )}
+
+          {selectedRunObjects.length === 2 && (
+            <RunComparison
+              selectedRunObjects={selectedRunObjects}
+              getDelta={getDelta}
+              setSelectedRuns={setSelectedRuns}
+            />
+          )}
         </>
       )}
 
-        {runs.length === 0 && (
-          <div className="card border border-[#262638] text-center py-16">
-            <h3 className="text-2xl font-bold mb-3">
-              No history yet
-            </h3>
+      {runs.length === 0 && (
+        <div className="card border border-[#262638] text-center py-16">
+          <h3 className="text-2xl font-bold mb-3">
+            No history yet
+          </h3>
 
-            <p className="text-slate-500">
-              Run a chunking comparison to create your first experiment record.
-            </p>
-          </div>
-        )}
+          <p className="text-slate-500">
+            Run a chunking comparison to create your first experiment record.
+          </p>
+        </div>
+      )}
 
-        {runs.length > 0 && filteredRuns.length === 0 && (
-          <div className="card border border-[#262638] text-center py-16">
-            <h3 className="text-2xl font-bold mb-3">
-              No matching experiments
-            </h3>
+      {runs.length > 0 && filteredRuns.length === 0 && (
+        <div className="card border border-[#262638] text-center py-16">
+          <h3 className="text-2xl font-bold mb-3">
+            No matching experiments
+          </h3>
 
-            <p className="text-slate-500">
-              Try changing your search or filter settings.
-            </p>
-          </div>
-        )}
+          <p className="text-slate-500">
+            Try changing your search or filter settings.
+          </p>
+        </div>
+      )}
 
-        {filteredRuns.length > 0 && (
-          <div className="space-y-6">
-            {filteredRuns.map((run, index) => {
-              const isExpanded = expandedRun === run.run_id;
+      {filteredRuns.length > 0 && (
+        <div className="space-y-6">
+          {filteredRuns.map((run, index) => {
+            const isExpanded = expandedRun === run.run_id;
 
-              return (
-                <HistoryRunCard
-                  key={run.run_id || index}
-                  run={run}
-                  isExpanded={isExpanded}
-                  selectedRuns={selectedRuns}
-                  getWinnerColor={getWinnerColor}
-                  toggleRunSelection={toggleRunSelection}
-                  setExpandedRun={setExpandedRun}
-                  exportRunAsJson={exportRunAsJson}
-                  deleteRun={deleteRun}
-                />
-              );
-
+            return (
+              <HistoryRunCard
+                key={run.run_id || index}
+                run={run}
+                isExpanded={isExpanded}
+                selectedRuns={selectedRuns}
+                getWinnerColor={getWinnerColor}
+                toggleRunSelection={toggleRunSelection}
+                setExpandedRun={setExpandedRun}
+                exportRunAsJson={exportRunAsJson}
+                deleteRun={deleteRun}
+              />
+            );
           })}
+
           {totalPages > 1 && (
             <HistoryPagination
               currentPage={currentPage}
@@ -452,8 +456,8 @@ function History() {
             />
           )}
         </div>
-        )}
-      </div>
+      )}
+    </div>
   );
 }
 

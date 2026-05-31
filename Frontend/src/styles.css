@@ -28,22 +28,23 @@ body {
   background: var(--bg);
   color: var(--text);
   font-family: var(--font);
+  font-size: 14px;
 }
 
 .card {
   background: var(--bg2);
   border: 1px solid var(--border);
-  border-radius: 14px;
-  padding: 20px;
+  border-radius: 8px;
+  padding: 14px;
 }
 
 .card-title {
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--text3);
-  margin-bottom: 16px;
+  margin-bottom: 10px;
 }
 
 .mono {
@@ -52,13 +53,185 @@ body {
 
 .pill {
   display: inline-block;
-  font-size: 11px;
+  font-size: 10px;
   font-family: var(--mono);
-  padding: 2px 8px;
+  padding: 2px 6px;
   border-radius: 4px;
   background: var(--bg3);
   color: var(--text2);
   border: 1px solid var(--border);
+}
+
+body .w-72 {
+  width: 15rem;
+}
+
+body .p-10 {
+  padding: 1.5rem;
+}
+
+body .p-6 {
+  padding: 1rem;
+}
+
+body .p-5 {
+  padding: 0.875rem;
+}
+
+body .p-4 {
+  padding: 0.75rem;
+}
+
+body .px-10 {
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+}
+
+body .px-6 {
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+body .px-5 {
+  padding-left: 0.875rem;
+  padding-right: 0.875rem;
+}
+
+body .px-4 {
+  padding-left: 0.75rem;
+  padding-right: 0.75rem;
+}
+
+body .py-6 {
+  padding-top: 0.875rem;
+  padding-bottom: 0.875rem;
+}
+
+body .py-4 {
+  padding-top: 0.625rem;
+  padding-bottom: 0.625rem;
+}
+
+body .py-3 {
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+}
+
+body .gap-8 {
+  gap: 1.25rem;
+}
+
+body .gap-6 {
+  gap: 1rem;
+}
+
+body .gap-5 {
+  gap: 0.875rem;
+}
+
+body .gap-4 {
+  gap: 0.75rem;
+}
+
+body .gap-3 {
+  gap: 0.625rem;
+}
+
+body .mb-12 {
+  margin-bottom: 2rem;
+}
+
+body .mb-10 {
+  margin-bottom: 1.5rem;
+}
+
+body .mb-8 {
+  margin-bottom: 1.25rem;
+}
+
+body .mb-6 {
+  margin-bottom: 1rem;
+}
+
+body .mb-5 {
+  margin-bottom: 0.875rem;
+}
+
+body .mb-4 {
+  margin-bottom: 0.75rem;
+}
+
+body .mt-5 {
+  margin-top: 0.875rem;
+}
+
+body .mt-4 {
+  margin-top: 0.75rem;
+}
+
+body .space-y-8 > :not(:last-child) {
+  margin-bottom: 1.25rem;
+}
+
+body .space-y-6 > :not(:last-child) {
+  margin-bottom: 1rem;
+}
+
+body .space-y-4 > :not(:last-child) {
+  margin-bottom: 0.75rem;
+}
+
+body .space-y-3 > :not(:last-child) {
+  margin-bottom: 0.625rem;
+}
+
+body .rounded-2xl {
+  border-radius: 10px;
+}
+
+body .rounded-xl {
+  border-radius: 8px;
+}
+
+body .rounded-lg {
+  border-radius: 6px;
+}
+
+body .text-5xl {
+  font-size: 2rem;
+  line-height: 2.35rem;
+}
+
+body .text-4xl {
+  font-size: 1.75rem;
+  line-height: 2.1rem;
+}
+
+body .text-3xl {
+  font-size: 1.5rem;
+  line-height: 1.9rem;
+}
+
+body .text-2xl {
+  font-size: 1.25rem;
+  line-height: 1.65rem;
+}
+
+body .text-xl {
+  font-size: 1.125rem;
+  line-height: 1.5rem;
+}
+
+body .text-lg {
+  font-size: 1rem;
+  line-height: 1.4rem;
+}
+
+body input,
+body select,
+body textarea,
+body button {
+  font-size: 0.875rem;
 }
 
 .custom-tooltip {

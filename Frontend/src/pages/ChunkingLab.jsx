@@ -294,7 +294,7 @@ function ChunkingLab() {
           />
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6">
 
           <div>
             <label className="block text-sm font-bold tracking-widest text-slate-400 uppercase mb-2">
@@ -443,7 +443,7 @@ function ChunkingLab() {
             />
           </div>
 
-          <div className="grid grid-cols-1 xl:grid-cols-2 gap-8 mb-8">
+          <div className="grid grid-cols-1 xl:grid-cols-2 gap-5 mb-8">
 
             <div className="card">
 
@@ -499,7 +499,7 @@ function ChunkingLab() {
             />
           </div>
 
-          <div className="grid grid-cols-1 xl:grid-cols-3 gap-8 mb-8">
+          <div className="grid grid-cols-1 xl:grid-cols-3 gap-5 mb-8">
 
             <ChunkViewer
               title="Fixed Chunks"
@@ -521,7 +521,7 @@ function ChunkingLab() {
 
           </div>
 
-          <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 xl:grid-cols-3 gap-5">
             <ResultCard
               title="Fixed Chunking"
               result={fixedResult}

@@ -1,4 +1,9 @@
+import asyncio
+import json
+from fastapi.responses import StreamingResponse
 from fastapi import APIRouter, BackgroundTasks
+from app.utils.history_store import save_run
+from datetime import datetime
 
 from app.services.batch_eval_service import (
     run_single_evaluation,
@@ -24,7 +29,7 @@ async def evaluate_single(request: dict):
     return result
 
 
-async def run_batch_job(job_id: str, items: list):
+async def run_batch_job(job_id: str, items: list, mode: str):
 
     update_job(
         job_id,
@@ -35,8 +40,24 @@ async def run_batch_job(job_id: str, items: list):
 
     result = await run_batch_evaluation(
         items,
-        job_id=job_id
+        job_id=job_id,
+        mode=mode
     )
+
+    history_entry = {
+        "run_id": job_id,
+        "timestamp": datetime.now().isoformat(),
+        "question": f"Batch Evaluation - {len(items)} items",
+        "ground_truth": "Batch evaluation dataset",
+        "chunk_size": None,
+        "chunk_overlap": None,
+        "winner": "Batch Evaluation",
+        "strategies": {
+            "batch": result
+        }
+    }
+
+    save_run(history_entry)
 
     finish_job(
         job_id,
@@ -51,7 +72,7 @@ async def evaluate_batch(
 ):
 
     items = request.get("items", [])
-
+    mode = request.get("mode", "manual")
     job_id = create_job()
 
     update_job(
@@ -62,7 +83,7 @@ async def evaluate_batch(
     background_tasks.add_task(
         run_batch_job,
         job_id,
-        items
+        items, mode
     )
 
     return {
@@ -83,3 +104,34 @@ async def get_batch_result(job_id: str):
         }
 
     return job
+
+@router.get("/evaluate/batch/{job_id}/stream")
+async def stream_batch_progress(job_id: str):
+
+    async def event_generator():
+
+        while True:
+
+            job = get_job(job_id)
+
+            if not job:
+                yield (
+                    "event: error\n"
+                    "data: {\"message\": \"Job not found\"}\n\n"
+                )
+                break
+
+            yield (
+                "event: progress\n"
+                f"data: {json.dumps(job)}\n\n"
+            )
+
+            if job["status"] == "completed":
+                break
+
+            await asyncio.sleep(1)
+
+    return StreamingResponse(
+        event_generator(),
+        media_type="text/event-stream"
+    )
