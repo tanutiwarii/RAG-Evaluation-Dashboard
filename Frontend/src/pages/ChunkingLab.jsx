@@ -17,6 +17,7 @@ import MetricProgress from "../components/common/MetricProgress";
 import RadarComparison from "../components/common/RadarComparison";
 import MetricInfo from "../components/common/MetricInfo";
 import ChunkViewer from "../components/chunking/ChunkViewer";
+import { API_URL } from "../config";
 
 function ChunkingLab() {
   const [text, setText] = useState("");
@@ -56,7 +57,7 @@ function ChunkingLab() {
       addEvent("Starting chunking comparison...");
 
       const response = await axios.post(
-        "http://127.0.0.1:8000/chunking/compare",
+        `${API_URL}/chunking/compare`,
         {
           text,
           question,

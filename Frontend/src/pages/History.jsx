@@ -12,6 +12,7 @@ import StrategyLeaderboard from "../components/history/StrategyLeaderboard";
 import HistorySkeleton from "../components/history/HistorySkeleton";
 import HistorySummary from "../components/history/HistorySummary";
 import HistoryCharts from "../components/history/HistoryCharts";
+import { API_URL } from "../config";
 
 function History() {
   const [runs, setRuns] = useState([]);
@@ -32,11 +33,11 @@ function History() {
       setError(null);
 
       const pageResponse = await axios.get(
-        `http://127.0.0.1:8000/history?page=${page}&limit=5`
+        `${API_URL}/history?page=${page}&limit=5`
       );
 
       const allResponse = await axios.get(
-        "http://127.0.0.1:8000/history?page=1&limit=10000"
+        `${API_URL}/history?page=1&limit=10000`
       );
 
       setRuns(pageResponse.data.items || []);
@@ -296,7 +297,7 @@ function History() {
     try {
       setActionError("");
       const response = await axios.get(
-        "http://127.0.0.1:8000/history?page=1&limit=10000"
+        `${API_URL}/history?page=1&limit=10000`
       );
 
       const blob = new Blob(
@@ -328,7 +329,7 @@ function History() {
     if (!confirmed) return;
 
     try {
-      await axios.delete("http://127.0.0.1:8000/history");
+      await axios.delete(`${API_URL}/history`);
       setRuns([]);
       setSelectedRuns([]);
       setExpandedRun(null);
@@ -346,7 +347,7 @@ function History() {
 
     try {
       await axios.delete(
-        `http://127.0.0.1:8000/history/${runId}`
+        `${API_URL}/history/${runId}`
       );
 
       setRuns((prev) =>

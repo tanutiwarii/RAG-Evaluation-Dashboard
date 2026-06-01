@@ -3,6 +3,7 @@ import axios from "axios";
 
 import EvalMetricGrid from "./EvalMetricGrid";
 import ErrorBanner from "../common/ErrorBanner";
+import { API_URL } from "../../config";
 
 function SingleEvalForm() {
   const [question, setQuestion] = useState("");
@@ -28,7 +29,7 @@ function SingleEvalForm() {
         .filter((item) => item.trim() !== "");
 
       const response = await axios.post(
-        "http://127.0.0.1:8000/evaluate/single",
+        `${API_URL}/evaluate/single`,
         {
           question,
           answer,

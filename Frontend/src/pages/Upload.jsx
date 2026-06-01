@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { API_URL } from "../config";
 
 function Upload() {
   const [file, setFile] = useState(null);
@@ -7,18 +8,19 @@ function Upload() {
   const [uploadMessage, setUploadMessage] = useState("");
   const [documents, setDocuments] = useState([]);
 
-  useEffect(() => {
-    fetchDocuments();
-  }, []);
-
-  const fetchDocuments = async () => {
+  async function fetchDocuments() {
     try {
-      const response = await axios.get("http://127.0.0.1:8000/documents");
+      const response = await axios.get(`${API_URL}/documents`);
       setDocuments(response.data.documents);
     } catch (error) {
       console.error(error);
     }
-  };
+  }
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    fetchDocuments();
+  }, []);
 
   const uploadPdf = async () => {
     if (!file) return;
@@ -31,7 +33,7 @@ function Upload() {
       setUploadMessage("");
 
       const response = await axios.post(
-        "http://127.0.0.1:8000/upload",
+        `${API_URL}/upload`,
         formData,
         {
           headers: {
@@ -53,7 +55,7 @@ function Upload() {
 
   const removeDocument = async (sourceName) => {
     try {
-      await axios.delete(`http://127.0.0.1:8000/documents/${sourceName}`);
+      await axios.delete(`${API_URL}/documents/${sourceName}`);
       await fetchDocuments();
     } catch (error) {
       console.error(error);
@@ -62,7 +64,7 @@ function Upload() {
 
   const clearKnowledgeBase = async () => {
     try {
-      await axios.delete("http://127.0.0.1:8000/documents");
+      await axios.delete(`${API_URL}/documents`);
       await fetchDocuments();
     } catch (error) {
       console.error(error);

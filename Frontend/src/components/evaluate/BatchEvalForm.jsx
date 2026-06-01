@@ -4,6 +4,7 @@ import BatchResultsTable from "./BatchResultsTable";
 import BatchProgress from "./BatchProgress";
 import EvalMetricGrid from "./EvalMetricGrid";
 import ErrorBanner from "../common/ErrorBanner";
+import { API_URL } from "../../config";
 
 function BatchEvalForm() {
   const [jsonInput, setJsonInput] = useState("");
@@ -73,7 +74,7 @@ function BatchEvalForm() {
       setEvalMode(normalizedData.mode || "manual");
 
       const response = await axios.post(
-        "http://127.0.0.1:8000/evaluate/batch",
+        `${API_URL}/evaluate/batch`,
         normalizedData
       );
 
@@ -87,7 +88,7 @@ function BatchEvalForm() {
       });
 
       const source = new EventSource(
-        `http://127.0.0.1:8000/evaluate/batch/${jobId}/stream`
+        `${API_URL}/evaluate/batch/${jobId}/stream`
       );
 
       setEventSource(source);
