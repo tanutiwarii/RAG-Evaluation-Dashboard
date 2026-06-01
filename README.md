@@ -52,7 +52,7 @@ Backend/app/core/rag_instance.py
 Both route handlers and services import from this shared module:
 
 ```python
-from app.core.rag_instance import rag_pipeline
+from app.core.rag_instance import get_rag_pipeline
 ```
 
 ## Tech Stack
