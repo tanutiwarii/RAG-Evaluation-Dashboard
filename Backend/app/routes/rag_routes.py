@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
-from app.rag.pipeline import RAGPipeline
+from app.core.rag_instance import rag_pipeline
 from app.db.supabase_client import supabase
 from fastapi import APIRouter
 
@@ -15,8 +15,6 @@ from app.models.evaluation import Evaluation
 from fastapi.responses import StreamingResponse
 
 router = APIRouter()
-
-rag_pipeline = RAGPipeline()
 
 
 @router.post("/ask")

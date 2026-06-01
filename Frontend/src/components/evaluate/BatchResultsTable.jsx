@@ -14,10 +14,10 @@ function BatchResultsTable({ results }) {
               <th className="text-left py-3 pr-4">Question</th>
               <th className="text-left py-3 pr-4">Generated Answer</th>
               <th className="text-left py-3 pr-4">Ground Truth</th>
-              <th className="text-left py-2 text-xs uppercase tracking-wide text-slate-400">Faithfulness</th>
-              <th className="text-left py-2 text-xs uppercase tracking-wide text-slate-400">Correctness</th>
-              <th className="text-left py-2 text-xs uppercase tracking-wide text-slate-400">Precision</th>
-              <th className="text-left py-2 text-xs uppercase tracking-wide text-slate-400">Recall</th>
+              <th className="text-left py-2 text-xs uppercase tracking-wide text-slate-400">F</th>
+              <th className="text-left py-2 text-xs uppercase tracking-wide text-slate-400">C</th>
+              <th className="text-left py-2 text-xs uppercase tracking-wide text-slate-400">P</th>
+              <th className="text-left py-2 text-xs uppercase tracking-wide text-slate-400">R</th>
             </tr>
           </thead>
 

@@ -1,7 +1,7 @@
 from app.evaluators.ragas_evaluator import evaluate_rag
 from app.services.job_manager import update_job
 import time
-from app.routes.rag_routes import rag_pipeline
+from app.core.rag_instance import rag_pipeline
 def format_contexts(contexts):
 
     formatted_contexts = []

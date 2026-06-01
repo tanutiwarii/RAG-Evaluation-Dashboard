@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 
+import ErrorBanner from "../components/common/ErrorBanner";
 import MetricInfo from "../components/common/MetricInfo";
 import HistoryHeader from "../components/history/HistoryHeader";
 import RunComparison from "../components/history/RunComparison";
@@ -23,17 +24,24 @@ function History() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [error, setError] = useState(null);
+  const [actionError, setActionError] = useState("");
+  const [allRuns, setAllRuns] = useState([]);
 
   const fetchHistory = async (page = 1) => {
     try {
       setError(null);
 
-      const response = await axios.get(
+      const pageResponse = await axios.get(
         `http://127.0.0.1:8000/history?page=${page}&limit=5`
       );
 
-      setRuns(response.data.items || []);
-      setTotalPages(response.data.pages || 1);
+      const allResponse = await axios.get(
+        "http://127.0.0.1:8000/history?page=1&limit=10000"
+      );
+
+      setRuns(pageResponse.data.items || []);
+      setAllRuns(allResponse.data.items || []);
+      setTotalPages(pageResponse.data.pages || 1);
     } catch (error) {
       console.error(error);
       setError(
@@ -45,6 +53,7 @@ function History() {
   };
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchHistory(currentPage);
   }, [currentPage]);
 
@@ -53,8 +62,10 @@ function History() {
     await fetchHistory(currentPage);
   };
 
-  const comparisonRuns = runs.filter(
-    (run) => run.winner !== "Batch Evaluation"
+  const comparisonRuns = allRuns.filter(
+    (run) =>
+      run.winner !== "Batch Evaluation" &&
+      run.winner !== "Single Evaluation"
   );
 
   const selectedRunObjects = comparisonRuns.filter((run) =>
@@ -283,6 +294,7 @@ function History() {
 
   const exportEntireHistory = async () => {
     try {
+      setActionError("");
       const response = await axios.get(
         "http://127.0.0.1:8000/history?page=1&limit=10000"
       );
@@ -304,7 +316,7 @@ function History() {
       URL.revokeObjectURL(url);
     } catch (error) {
       console.error(error);
-      window.alert("Failed to export full history.");
+      setActionError("Failed to export full history.");
     }
   };
 
@@ -361,6 +373,8 @@ function History() {
         onClearHistory={clearhistory}
       />
 
+      <ErrorBanner message={actionError} />
+
       <HistoryFilters
         search={search}
         setSearch={setSearch}
@@ -407,11 +421,11 @@ function History() {
       {runs.length === 0 && (
         <div className="card border border-[#262638] text-center py-16">
           <h3 className="text-2xl font-bold mb-3">
-            No history yet
+            No evaluations found.
           </h3>
 
           <p className="text-slate-500">
-            Run a chunking comparison to create your first experiment record.
+            Run your first evaluation.
           </p>
         </div>
       )}

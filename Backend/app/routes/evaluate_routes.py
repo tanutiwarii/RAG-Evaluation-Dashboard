@@ -16,18 +16,37 @@ from app.services.job_manager import (
     finish_job,
     get_job
 )
-
+from app.schemas.evaluation_schema import (
+    SingleEvaluationRequest,
+    BatchEvaluationRequest
+)
 
 router = APIRouter()
 
 
 @router.post("/evaluate/single")
-async def evaluate_single(request: dict):
+async def evaluate_single(request: SingleEvaluationRequest):
 
-    result = await run_single_evaluation(request)
+    result = await run_single_evaluation(
+        request.model_dump()
+    )
+
+    history_entry = {
+        "run_id": f"single_{datetime.now().timestamp()}",
+        "timestamp": datetime.now().isoformat(),
+        "question": result["question"],
+        "ground_truth": result["ground_truth"],
+        "chunk_size": None,
+        "chunk_overlap": None,
+        "winner": "Single Evaluation",
+        "strategies": {
+            "single": result
+        }
+    }
+
+    save_run(history_entry)
 
     return result
-
 
 async def run_batch_job(job_id: str, items: list, mode: str):
 
@@ -67,12 +86,12 @@ async def run_batch_job(job_id: str, items: list, mode: str):
 
 @router.post("/evaluate/batch")
 async def evaluate_batch(
-    request: dict,
+    request: BatchEvaluationRequest,
     background_tasks: BackgroundTasks
 ):
 
-    items = request.get("items", [])
-    mode = request.get("mode", "manual")
+    items = request.items
+    mode = request.mode
     job_id = create_job()
 
     update_job(

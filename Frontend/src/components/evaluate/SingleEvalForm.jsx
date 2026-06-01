@@ -2,6 +2,7 @@ import { useState } from "react";
 import axios from "axios";
 
 import EvalMetricGrid from "./EvalMetricGrid";
+import ErrorBanner from "../common/ErrorBanner";
 
 function SingleEvalForm() {
   const [question, setQuestion] = useState("");
@@ -10,15 +11,17 @@ function SingleEvalForm() {
   const [contexts, setContexts] = useState("");
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   const runSingleEval = async () => {
     if (!question || !answer || !contexts) {
-      alert("Question, answer, and contexts are required.");
+      setErrorMessage("Question, answer, and contexts are required.");
       return;
     }
 
     try {
       setLoading(true);
+      setErrorMessage("");
 
       const contextList = contexts
         .split("\n")
@@ -37,7 +40,10 @@ function SingleEvalForm() {
       setResult(response.data);
     } catch (error) {
       console.error(error);
-      alert("Single evaluation failed.");
+      setErrorMessage(
+        error.response?.data?.error ||
+        "Single evaluation failed."
+      );
     } finally {
       setLoading(false);
     }
@@ -53,6 +59,8 @@ function SingleEvalForm() {
         <p className="text-slate-500 mb-6">
           Evaluate one RAG response using question, answer, contexts, and ground truth.
         </p>
+
+        <ErrorBanner message={errorMessage} />
 
         <div className="space-y-5">
           <input
@@ -96,6 +104,14 @@ function SingleEvalForm() {
           </button>
         </div>
       </div>
+
+      {!result && (
+        <div className="card border border-[#262638] text-center">
+          <p className="text-slate-400">
+            Run an evaluation to see metrics.
+          </p>
+        </div>
+      )}
 
       {result && (
         <div className="space-y-6">

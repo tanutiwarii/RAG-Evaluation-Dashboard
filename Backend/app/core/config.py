@@ -1,0 +1,22 @@
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
+
+GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
+GITHUB_MODEL = os.getenv("GITHUB_MODEL")
+GITHUB_ENDPOINT = os.getenv("GITHUB_ENDPOINT")
+
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+OPENAI_BASE_URL = os.getenv("OPENAI_BASE_URL")
+
+DATABASE_URL = os.getenv("DATABASE_URL")
+
+SUPABASE_URL = os.getenv("SUPABASE_URL")
+SUPABASE_KEY = os.getenv("SUPABASE_KEY")
+SUPABASE_SERVICE_ROLE_KEY = os.getenv("SUPABASE_SERVICE_ROLE_KEY")
+
+LANGCHAIN_PROJECT = os.getenv("LANGCHAIN_PROJECT")
+LANGCHAIN_TRACING_V2 = os.getenv("LANGCHAIN_TRACING_V2")
+LANGCHAIN_API_KEY = os.getenv("LANGCHAIN_API_KEY")

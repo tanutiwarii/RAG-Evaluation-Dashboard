@@ -1,0 +1,13 @@
+.env
+Backend/.env
+Backend/.venv
+Backend/chroma_db
+Backend/uploads
+Backend/requirements_full.txt
+__pycache__
+*.pyc
+node_modules
+Frontend/node_modules
+Frontend/dist
+.DS_Store
+*.log

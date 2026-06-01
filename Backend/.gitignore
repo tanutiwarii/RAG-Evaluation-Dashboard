@@ -1,5 +1,24 @@
-.venv/
+# Env
 .env
-__pycache__/
+Backend/.env
+
+# Python
+Backend/.venv
+__pycache__
 *.pyc
+
+# Node
+Frontend/node_modules
+node_modules
+Frontend/dist
+
+# Local data
+Backend/chroma_db
+Backend/uploads
+Backend/app/data/evaluation_history.json
+
+# Logs
+*.log
+
+# OS
 .DS_Store

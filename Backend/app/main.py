@@ -10,6 +10,11 @@ from app.routes.upload_routes import (
 from app.routes.chunking_routes import (
     router as chunking_router
 )
+from app.core.exceptions import (
+    generic_exception_handler
+)
+
+
 app = FastAPI()
 
 app.add_middleware(
@@ -24,3 +29,7 @@ app.include_router(rag_router)
 app.include_router(upload_router)
 app.include_router(chunking_router)
 app.include_router(evaluate_router)
+app.add_exception_handler(
+    Exception,
+    generic_exception_handler
+)

@@ -11,6 +11,7 @@ function HistoryRunCard({
   deleteRun
 }) {
   const isBatchRun = run.winner === "Batch Evaluation";
+  const isSingleRun = run.winner === "Single Evaluation";
 
   const strategyCards = [
     {
@@ -160,6 +161,48 @@ function HistoryRunCard({
             />
           </div>
         </div>
+
+        ) : isSingleRun ? (
+        <div className="bg-[#111118] border border-[#262638] rounded-xl p-5">
+          <h4 className="text-xl font-bold mb-4 text-cyan-400">
+            Single Evaluation
+          </h4>
+
+          <div className="space-y-3">
+            <MetricRow
+              label="Faithfulness"
+              value={`${(
+                (run.strategies?.single?.metrics?.faithfulness || 0) * 100
+              ).toFixed(0)}%`}
+            />
+
+            <MetricRow
+              label="Correctness"
+              value={`${(
+                (run.strategies?.single?.metrics?.answer_correctness || 0) * 100
+              ).toFixed(0)}%`}
+            />
+
+            <MetricRow
+              label="Precision"
+              value={`${(
+                (run.strategies?.single?.metrics?.context_precision || 0) * 100
+              ).toFixed(0)}%`}
+            />
+
+            <MetricRow
+              label="Recall"
+              value={`${(
+                (run.strategies?.single?.metrics?.context_recall || 0) * 100
+              ).toFixed(0)}%`}
+            />
+
+            <MetricRow
+              label="Latency"
+              value={`${run.strategies?.single?.metrics?.latency || 0}s`}
+            />
+          </div>
+        </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {strategyCards.map((strategy, idx) => (
@@ -205,6 +248,8 @@ function HistoryRunCard({
         <div className="mt-8 pt-8 border-t border-[#262638]">
           {isBatchRun ? (
             <BatchRunDetails run={run} />
+          ) : isSingleRun ? (
+            <SingleRunDetails run={run} />
           ) : (
             <StandardRunDetails
               run={run}
@@ -387,6 +432,70 @@ function BatchRunDetails({ run }) {
             </div>
           </div>
         ))}
+      </div>
+    </>
+  );
+}
+function SingleRunDetails({ run }) {
+  const single = run.strategies?.single;
+
+  return (
+    <>
+      <h3 className="text-2xl font-bold mb-6">
+        Single Evaluation Details
+      </h3>
+
+      <div className="bg-[#111118] border border-[#262638] rounded-xl p-5 mb-6">
+        <h4 className="font-bold mb-3">
+          Generated Answer
+        </h4>
+
+        <p className="text-sm text-slate-300 leading-relaxed">
+          {single?.answer || "No answer available."}
+        </p>
+      </div>
+
+      <div className="bg-[#111118] border border-[#262638] rounded-xl p-5 mb-6">
+        <h4 className="font-bold mb-3">
+          Ground Truth
+        </h4>
+
+        <p className="text-sm text-slate-300 leading-relaxed">
+          {single?.ground_truth || "Not provided"}
+        </p>
+      </div>
+
+      <div className="bg-[#111118] border border-[#262638] rounded-xl p-5">
+        <h4 className="font-bold mb-4">
+          Retrieved Contexts
+        </h4>
+
+        <div className="space-y-3">
+          {(single?.contexts || []).map((context, index) => (
+            <div
+              key={index}
+              className="bg-[#171722] border border-[#262638] rounded-lg p-3"
+            >
+              <div className="flex flex-wrap gap-2 mb-2">
+                <span className="pill">
+                  Chunk #{context.chunk_id}
+                </span>
+
+                <span className="pill">
+                  Rank #{context.rank}
+                </span>
+
+                <span className="pill">
+                  Score: {context.score}
+                </span>
+              </div>
+
+              <p className="text-xs text-slate-400 leading-relaxed">
+                {context.content}
+              </p>
+            </div>
+          ))}
+        </div>
       </div>
     </>
   );
