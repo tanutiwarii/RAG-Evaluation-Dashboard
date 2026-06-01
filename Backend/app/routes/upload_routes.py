@@ -42,6 +42,11 @@ async def upload_pdf(
 
     rag_pipeline = get_rag_pipeline()
 
+    if rag_pipeline is None:
+        return {
+            "error": "Pipeline mode is disabled in free deployment. Use manual evaluation mode."
+        }
+
     rag_pipeline.load_pdf(
         pdf_text,
         file.filename
@@ -59,6 +64,11 @@ async def get_documents():
 
     rag_pipeline = get_rag_pipeline()
 
+    if rag_pipeline is None:
+        return {
+            "error": "Pipeline mode is disabled in free deployment. Use manual evaluation mode."
+        }
+
     return {
         "documents":
         rag_pipeline.get_loaded_documents()
@@ -71,6 +81,11 @@ async def delete_document(
 ):
 
     rag_pipeline = get_rag_pipeline()
+
+    if rag_pipeline is None:
+        return {
+            "error": "Pipeline mode is disabled in free deployment. Use manual evaluation mode."
+        }
 
     rag_pipeline.remove_document(
         source_name
@@ -86,6 +101,11 @@ async def delete_document(
 async def clear_documents():
 
     rag_pipeline = get_rag_pipeline()
+
+    if rag_pipeline is None:
+        return {
+            "error": "Pipeline mode is disabled in free deployment. Use manual evaluation mode."
+        }
 
     rag_pipeline.clear_knowledge_base()
 

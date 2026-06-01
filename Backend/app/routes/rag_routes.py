@@ -26,6 +26,12 @@ async def ask_question(
     question = request["question"]
 
     rag_pipeline = get_rag_pipeline()
+
+    if rag_pipeline is None:
+        return {
+            "error": "Pipeline mode is disabled in free deployment. Use manual evaluation mode."
+        }
+
     result = await rag_pipeline.ask(question)
 
 
@@ -88,6 +94,11 @@ async def ask_question_stream(
     question = request["question"]
 
     rag_pipeline = get_rag_pipeline()
+
+    if rag_pipeline is None:
+        return {
+            "error": "Pipeline mode is disabled in free deployment. Use manual evaluation mode."
+        }
 
     return StreamingResponse(
         rag_pipeline.ask_stream(question),

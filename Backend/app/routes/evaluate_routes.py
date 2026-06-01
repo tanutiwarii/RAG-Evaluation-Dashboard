@@ -20,6 +20,7 @@ from app.schemas.evaluation_schema import (
     SingleEvaluationRequest,
     BatchEvaluationRequest
 )
+from app.core.rag_instance import get_rag_pipeline
 
 router = APIRouter()
 
@@ -92,6 +93,15 @@ async def evaluate_batch(
 
     items = request.items
     mode = request.mode
+
+    if mode == "pipeline":
+        rag_pipeline = get_rag_pipeline()
+
+        if rag_pipeline is None:
+            return {
+                "error": "Pipeline mode is disabled in free deployment. Use manual evaluation mode."
+            }
+
     job_id = create_job()
 
     update_job(

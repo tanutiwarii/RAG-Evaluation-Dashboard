@@ -76,6 +76,14 @@ async def run_batch_evaluation(
 
             rag_pipeline = get_rag_pipeline()
 
+            if rag_pipeline is None:
+                return {
+                    "error": "Pipeline mode is disabled in free deployment. Use manual evaluation mode.",
+                    "count": 0,
+                    "results": [],
+                    "aggregate_metrics": {}
+                }
+
             pipeline_result = await rag_pipeline.ask(
                 item["question"]
             )
