@@ -25,6 +25,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+@app.get("/healthz")
+def health():
+    return {"status": "ok"}
+
 app.include_router(rag_router)
 app.include_router(upload_router)
 app.include_router(chunking_router)
