@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
-from app.core.rag_instance import rag_pipeline
+from app.core.rag_instance import get_rag_pipeline
 from app.db.supabase_client import supabase
 from fastapi import APIRouter
 
@@ -25,7 +25,9 @@ async def ask_question(
 
     question = request["question"]
 
+    rag_pipeline = get_rag_pipeline()
     result = await rag_pipeline.ask(question)
+
 
     metrics = await evaluate_rag(
         question=question,
@@ -84,6 +86,8 @@ async def ask_question_stream(
 ):
 
     question = request["question"]
+
+    rag_pipeline = get_rag_pipeline()
 
     return StreamingResponse(
         rag_pipeline.ask_stream(question),

@@ -1,7 +1,7 @@
 from app.evaluators.ragas_evaluator import evaluate_rag
 from app.services.job_manager import update_job
 import time
-from app.core.rag_instance import rag_pipeline
+from app.core.rag_instance import get_rag_pipeline
 def format_contexts(contexts):
 
     formatted_contexts = []
@@ -73,6 +73,8 @@ async def run_batch_evaluation(
     for index, item in enumerate(items):
 
         if mode == "pipeline":
+
+            rag_pipeline = get_rag_pipeline()
 
             pipeline_result = await rag_pipeline.ask(
                 item["question"]

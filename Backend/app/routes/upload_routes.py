@@ -10,10 +10,7 @@ from app.services.pdf_service import (
     extract_text_from_pdf
 )
 
-from app.routes.rag_routes import (
-    rag_pipeline
-)
-
+from app.core.rag_instance import get_rag_pipeline
 router = APIRouter()
 
 UPLOAD_DIR = "uploads"
@@ -43,6 +40,8 @@ async def upload_pdf(
 
     print("Indexing PDF...")
 
+    rag_pipeline = get_rag_pipeline()
+
     rag_pipeline.load_pdf(
         pdf_text,
         file.filename
@@ -58,6 +57,8 @@ async def upload_pdf(
 @router.get("/documents")
 async def get_documents():
 
+    rag_pipeline = get_rag_pipeline()
+
     return {
         "documents":
         rag_pipeline.get_loaded_documents()
@@ -68,6 +69,8 @@ async def get_documents():
 async def delete_document(
     source_name: str
 ):
+
+    rag_pipeline = get_rag_pipeline()
 
     rag_pipeline.remove_document(
         source_name
@@ -81,6 +84,8 @@ async def delete_document(
 
 @router.delete("/documents")
 async def clear_documents():
+
+    rag_pipeline = get_rag_pipeline()
 
     rag_pipeline.clear_knowledge_base()
 
