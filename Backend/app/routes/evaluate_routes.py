@@ -99,7 +99,7 @@ async def evaluate_batch(
 
         if rag_pipeline is None:
             return {
-                "error": "Pipeline mode is disabled in free deployment. Use manual evaluation mode."
+                "error": "Pipeline mode is disabled in light deployment."
             }
 
     job_id = create_job()

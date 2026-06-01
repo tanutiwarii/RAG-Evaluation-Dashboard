@@ -1,3 +1,5 @@
+import os
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.routes.evaluate_routes import router as evaluate_router
@@ -6,9 +8,6 @@ from app.routes.rag_routes import (
 )
 from app.routes.upload_routes import (
     router as upload_router
-)
-from app.routes.chunking_routes import (
-    router as chunking_router
 )
 from app.core.exceptions import (
     generic_exception_handler
@@ -31,8 +30,15 @@ def health():
 
 app.include_router(rag_router)
 app.include_router(upload_router)
-app.include_router(chunking_router)
 app.include_router(evaluate_router)
+
+if os.getenv("DEPLOY_MODE") != "light":
+    from app.routes.chunking_routes import (
+        router as chunking_router
+    )
+
+    app.include_router(chunking_router)
+
 app.add_exception_handler(
     Exception,
     generic_exception_handler

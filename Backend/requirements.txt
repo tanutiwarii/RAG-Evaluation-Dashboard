@@ -6,24 +6,17 @@ python-multipart
 sqlalchemy
 psycopg2-binary
 supabase
-
 pydantic
-
-langchain
-langchain-community
-langchain-core
-langchain-text-splitters
-langchain-openai
-langsmith
-langchain-experimental
-
-chromadb
-sentence-transformers
-rank-bm25
-scikit-learn
-numpy
 
 openai
 ragas
+
+langchain
+langchain-core
+langchain-community
+langchain-text-splitters
+langchain-openai
+langchain-experimental
+langsmith
 
 pypdf

@@ -78,7 +78,7 @@ async def run_batch_evaluation(
 
             if rag_pipeline is None:
                 return {
-                    "error": "Pipeline mode is disabled in free deployment. Use manual evaluation mode.",
+                    "error": "Pipeline mode is disabled in light deployment.",
                     "count": 0,
                     "results": [],
                     "aggregate_metrics": {}

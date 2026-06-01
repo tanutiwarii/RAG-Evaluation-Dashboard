@@ -29,7 +29,7 @@ async def ask_question(
 
     if rag_pipeline is None:
         return {
-            "error": "Pipeline mode is disabled in free deployment. Use manual evaluation mode."
+            "error": "Pipeline mode is disabled in light deployment."
         }
 
     result = await rag_pipeline.ask(question)
@@ -97,7 +97,7 @@ async def ask_question_stream(
 
     if rag_pipeline is None:
         return {
-            "error": "Pipeline mode is disabled in free deployment. Use manual evaluation mode."
+            "error": "Pipeline mode is disabled in light deployment."
         }
 
     return StreamingResponse(
