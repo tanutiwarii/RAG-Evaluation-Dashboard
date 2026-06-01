@@ -38,6 +38,13 @@ if os.getenv("DEPLOY_MODE") != "light":
     )
 
     app.include_router(chunking_router)
+@app.get("/")
+def root():
+    return {
+        "message": "RAG Evaluation Dashboard API",
+        "docs": "/docs",
+        "health": "/healthz"
+    }
 
 app.add_exception_handler(
     Exception,
