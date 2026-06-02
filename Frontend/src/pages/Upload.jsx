@@ -11,7 +11,7 @@ function Upload() {
   async function fetchDocuments() {
     try {
       const response = await axios.get(`${API_URL}/documents`);
-      setDocuments(response.data.documents);
+      setDocuments(Array.isArray(response.data) ? response.data : []);
     } catch (error) {
       console.error(error);
     }
@@ -83,6 +83,13 @@ function Upload() {
         <h2 className="text-2xl font-semibold mb-4">
           Upload Knowledge Base PDF
         </h2>
+        <div className="card">
+          <h2>Knowledge Base Disabled</h2>
+          <p>
+            PDF upload and local vector retrieval are disabled in the free live deployment.
+            Use Single Evaluation or Manual Batch Evaluation.
+          </p>
+        </div>
 
         <div className="flex gap-4 items-center">
           <input
