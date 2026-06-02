@@ -13,7 +13,7 @@ from app.core.exceptions import (
     generic_exception_handler
 )
 
-from app.routes.chunking_routes import router as history_router
+from app.routes.history_routes import router as history_router
 app = FastAPI()
 
 app.add_middleware(
