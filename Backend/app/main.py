@@ -13,7 +13,7 @@ from app.core.exceptions import (
     generic_exception_handler
 )
 
-
+from app.routes.chunking_routes import router as history_router
 app = FastAPI()
 
 app.add_middleware(
@@ -31,6 +31,10 @@ def health():
 app.include_router(rag_router)
 app.include_router(upload_router)
 app.include_router(evaluate_router)
+app.include_router(rag_router)
+app.include_router(upload_router)
+app.include_router(evaluate_router)
+app.include_router(history_router)
 
 if os.getenv("DEPLOY_MODE") != "light":
     from app.routes.chunking_routes import (
